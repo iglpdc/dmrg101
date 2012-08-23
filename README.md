@@ -18,12 +18,12 @@ performance so it's probably not useful for research purposes.
 Authors
 -------
 
-See the AUTHORS file
+See the AUTHORS file.
 
 License
 -------
 
-See the LICENSE file
+See the LICENSE file.
 
 Requirements
 ------------
@@ -32,14 +32,14 @@ To be able to install `dmrg101` in your computer, you need to have Python
 installed and an internet connection to download some extra packages used
 by `dmrg101`. Both Python and all the rest of the packages used by
 `dmrg101` are avaliable for free from the Internet. Find the details under
-the **Install** section
+the **Install** section.
 
 `dmrg101` will run and install in any operating system (Windows, Linux,
-Mac,...). The packages installed by `dmrg101` are installed in an isolated
+Mac,...) The packages installed by `dmrg101` are installed in an isolated
 enviroment, so they won't mess up with other versions that you have
 previously installed in your machine.
 
 Install
 -------
 
-See the INSTALL file
+See the INSTALL file.
