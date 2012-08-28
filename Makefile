@@ -3,3 +3,6 @@ init:
 
 test: 
 	nosetests tests
+
+requires:
+	pip freeze > requirements.txt
