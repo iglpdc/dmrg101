@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from distutils.core import setup
-from dmrg101.version import __version__
+from version import __version__
 
 setup(name='dmrg101',
 		version=__version__,
@@ -22,5 +22,6 @@ setup(name='dmrg101',
 			'Topic :: Scientific/Engineering :: Physics',
 			],
 		packages = ['dmrg101', 'dmrg101.core', 'dmrg101.utils'],
+		py_modules = ['version'],
 		requires = [],
 		)
