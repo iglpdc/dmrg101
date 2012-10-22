@@ -6,3 +6,6 @@ test:
 
 requires:
 	pip freeze > requirements.txt
+
+dist:
+	python setup.py sdist --formats=gztar,zip
