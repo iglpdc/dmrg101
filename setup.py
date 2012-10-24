@@ -8,6 +8,7 @@ setup(name='dmrg101',
 		description='Pedagogical implementation of the DMRG algorithm',
 		long_description=open('README.md').read(),
 		author='Ivan Gonzalez',
+		author_email='iglpdc@gmail.com',
 		url='https://github.com/iglpdc/dmrg101',
 		license='MIT',
 		classifiers=[
