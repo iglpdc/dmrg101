@@ -97,10 +97,13 @@ class Wavefunction(object):
 	except ValueError:
 	    raise DMRGException("Wavefunction norm is zero")
 
+    def randomize(self):
+	"""Fills the wavefunction with random values and normalizes.
 
-
-
-
-
-
-		
+	You use this function to generate a random wavefunction, i.e. one
+	whose elements are random number. The wavefunction is normalized.
+	The old elements of the wavefunction (if there were any) are
+	lost after using this function.
+	"""
+	self.as_matrix=np.random(self.left_dim, self.right_dim)
+	self.normalize()
