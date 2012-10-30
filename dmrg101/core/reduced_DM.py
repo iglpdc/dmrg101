@@ -3,7 +3,8 @@ File: diagonalize.py
 Author: Ivan Gonzalez
 Description: Diagonalizes a hermitian/square matrix using numpy
 '''
-from numpy import linalg as LA
+import numpy as np
+from dmrg_exceptions import DMRGException
 
 def diagonalize(reduced_density_matrix):
     """Diagonalizes a hermitian or square matrix.
@@ -11,22 +12,25 @@ def diagonalize(reduced_density_matrix):
     You use this function to diagonalize the reduced density matrix. 
     It just calls the corresponding routine in numpy.
     
-    Attributes:
+    Parameters
+    ----------
        reduced_density_matrix: a numpy matrix which is hermitian (if
                                complex), or square (if real).
     
-    Returns:
+    Returns
+    -------
        eigenvals: a numpy array with the eigenvalues (not ordered).
                   The number of eigenvalues is the size if the matrix.
        eigenvecs: a numpy array with the corresponding eigenvectors.
        	          Each column correspond to an eigenvector, such as
     	          eigenvecs[ : i] corresponds to eigenvals[i].
     
-    Raises:
+    Raises
+    ______
         DMRGException: if the computation cannot be performed.
     """
     try:
-        eigenvals, eigenvecs = LA.eigh(reduced_density_matrix)	
+        eigenvals, eigenvecs = np.linalg.eigh(reduced_density_matrix)	
     except LinAlgError:
 	raise DMRGException("Error diagonalizing the reduced DM")
 
@@ -52,7 +56,8 @@ def truncate(number_of_states_to_keep,
     are the column indexes that these eigenvectors occupy in the 
     the resulting truncated matrix.
     
-    Attributes:
+    Parameters
+    ----------
         number_of_states_to_keep: an int with the number of eigenvalues (or
                                   eigenvectors) kept. It is the same as 
     			          the dimension of the truncated Hilbert space.
@@ -64,36 +69,42 @@ def truncate(number_of_states_to_keep,
                                           eigenvectors if the reduced
     				      density matrix.
     
-    Returns:
+    Returns
+    -------
         truncated_eigenvals: a numpy array with the eigenvalues kept.
         transformation_matrix: a numpy array with the eigenvectors
                                kept. this defines the DMRG
     			   transformation matrix.
+    Raises
+    ------
+        DMRGException if the eigenvalues are not a 1-dim array, or the
+	    matrix with the eigenvecs is not square and with the proper
+	    dimensions
     """
     if (reduced_density_matrix_eigenvals.ndim != 1):
         raise DMRGException("Bad arg: reduced_density_matrix_eigenvals")
     
-    number_of_states=reduced_density_matrix_eigenvals.size
+    number_of_states = reduced_density_matrix_eigenvals.size
 
     if (reduced_density_matrix_eigenvecs.shape != (number_of_states,
       		                                   number_of_states) )
         raise DMRGException("Bad arg: reduced_density_matrix_eigenvecs")
    
     # if you don't have enough states, keep them all
-    if (number_of_states_to_keep>number_of_states):
-	number_of_states_to_keep=number_of_states
+    if (number_of_states_to_keep > number_of_states):
+	number_of_states_to_keep = number_of_states
     #
     # sort the indexes of the eigenvals array according to their
     # eigenvalue in increasing order
     #
-    indexes_in_increasing_order=np.argsort(reduced_density_matrix_eigenvals)
+    indexes_in_increasing_order = np.argsort(reduced_density_matrix_eigenvals)
     #
     # get last number_of_states_to_keep of them, i.e. the ones that
     # correspond to the largest number_of_states_to_keep eigenvals, and
     # reorder them indexes back, so you don't change the original order of 
     # the eigenvalues and eigenvectors. 
     #
-    indexes_to_keep=np.sort(indexes_in_increasing_order[-number_of_states_to_keep])
+    indexes_to_keep = np.sort(indexes_in_increasing_order[-number_of_states_to_keep])
     # 
     # numpy arrays support fancy indexing, such that given a subset of
     # the indexes to the original array gives a view of the array with
