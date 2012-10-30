@@ -3,8 +3,8 @@ File: sites.py
 Author: Ivan Gonzalez
 Description: The class for single sites
 '''
-from core.exceptions import DMRGException
 from numpy import zeros, eye
+from dmrg_exceptions import DMRGException
 
 class Site(object):
     """A general single site
