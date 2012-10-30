@@ -4,8 +4,8 @@ Author: Ivan Gonzalez
 Description: The class for wavefunctions
 '''
 import numpy as np
-from core.exceptions import DMRGException
-from core.braket import braket
+from dmrg_exceptions import DMRGException
+from braket import braket
 
 class Wavefunction(object):
     """A wavefunction object
@@ -15,7 +15,8 @@ class Wavefunction(object):
     left block, and the columns corresponding to the states of the
     right block. 
     
-    Attributes:
+    Parameters
+    ----------
         left_dim: an int with the dimension of the Hilbert space of the left block
         right_dim: an int with the dimension of the Hilbert space of the right block
 	num_type: a type (double, complex) with the type of the
@@ -28,16 +29,17 @@ class Wavefunction(object):
     	contents are garbage. You *must* give it a value before use it for
 	any calculation.
     
-    	Raises:
+    	Raises
+	------
     	    DMRGException: if the left_dim, right_dim are not
     	    integers.
     	"""
     	super(Wavefunction, self).__init__()
     	try:
-    		self.as_matrix = np.empty((left_dim, right_dim), 
-    				          num_type)
+    	    self.as_matrix = np.empty((left_dim, right_dim), 
+    				       num_type)
     	except TypeError:
-    		raise DMRGException("Bad args for wavefunction")
+    	    raise DMRGException("Bad args for wavefunction")
     	self.left_dim = left_dim
     	self.right_dim = right_dim
 
@@ -48,31 +50,42 @@ class Wavefunction(object):
 	wavefunction. The reduced DM is itself a square and hermitian
 	matrix as it should.
 
-	Attributes:
+	Parameters
+	----------
 	    block_to_be_traced_over: a string with which block (left or
 	    right) will be traced over.
 
- 	Returns:
+ 	Returns
+	-------
 	    a square and hermitian matrix with the reduced DM.
+
+        Raises
+	------
+	    DMRGException if the name for the block to be traced out is 
+	        not correct
 	"""
 	if block_to_be_traced_over not in ('left', 'right'):
-		raise DMRGException("block_to_be_traced_over must be left
-				     or right")
+	    raise DMRGException("block_to_be_traced_over must be left
+	 		         or right")
 	
 	result=np.array(self.as_matrix.dtype.name)
 
 	if (block_to_be_traced_over == 'left'):
-		result=np.transpose(self.as_matrix)*self.as_matrix
+	    result = np.dot(np.transpose(self.as_matrix), self.as_matrix)
 	else:
-		result=self.as_matrix*np.transpose(self.as_matrix)
+	    result = np.dot(self.as_matrix, np.transpose(self.as_matrix))
 	return result
 
     def get_norm(self):
 	""" Calculates the norm of a wavefunction
 
 	Simply uses the braket function to calculate the norm.
-	The wavefunction is unchanged calculation. Use normalize if
+	The wavefunction is *unchanged* upon calculation. Use normalize if
 	you want to normalize the wavefunction.
+
+	Returns
+	-------
+	    a double with the norm of the wavefunction
 	"""
 	norm_squared=braket(self, self)
 
@@ -85,15 +98,17 @@ class Wavefunction(object):
     def normalize(self):
 	""" Normalizes the wavefunction
 
-	Postcond:
+	Postcond
+	--------
 	    The wavefunction is normalized, i.e. changes to have norm
-	    1.0a
-	    .
-	Raises:
+	    1.0.
+
+	Raises
+	------
 	    DMRGException: if the norm of the wavefunction is zero.
 	"""
 	try:
-	    self.as_matrix=/get_norm(self)
+	    self.as_matrix/=get_norm(self)
 	except ValueError:
 	    raise DMRGException("Wavefunction norm is zero")
 
@@ -104,6 +119,11 @@ class Wavefunction(object):
 	whose elements are random number. The wavefunction is normalized.
 	The old elements of the wavefunction (if there were any) are
 	lost after using this function.
+
+	Postcond
+	--------
+	    The wavefunction is filled with random elements and has norm
+	    1.0.
 	"""
 	self.as_matrix=np.random(self.left_dim, self.right_dim)
 	self.normalize()
