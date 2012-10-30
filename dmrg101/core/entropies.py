@@ -5,6 +5,7 @@ Description: Functions to calculate entanglement entropies
 '''
 from sys import float_info
 from numpy import vectorize, power
+from math import log
 
 def calculate_xlogx(x, epsilon):
     """Calculates :math:`x\log x` of the argument
@@ -55,7 +56,7 @@ def calculate_entropy(reduced_density_matrix_evals):
 	                    float_info.epsilon))
     return result
 
-def calculate_renyi_entropy(reduced_density_matrix_evals, n=2):
+def calculate_renyi(reduced_density_matrix_evals, n=2):
     """Calculates the n-th Renyi entropy
 
     You use this function to calculate the n-th Renyi entanglement entropy 
@@ -87,5 +88,5 @@ def calculate_renyi_entropy(reduced_density_matrix_evals, n=2):
 	result = calculate_entropy(reduced_density_matrix_evals)
     else:
         result = log(sum(power(reduced_density_matrix_evals, n)))
-	result =/ (1.0-n)
+	result /= (1.0-n)
     return result
