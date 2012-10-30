@@ -3,8 +3,8 @@ File: braket.py
 Author: Ivan Gonzalez
 Description: A function to implement quantum-mechanics brakets
 '''
-from numpy import inner
-from core.exceptions import DMRGException
+from numpy import inner, conjugate
+from dmrg_exceptions import DMRGException
 
 def braket(bra, ket):
     """Takes a bra and a ket and return their braket
@@ -16,16 +16,19 @@ def braket(bra, ket):
     The wavefunction in the bra is hermitian conjugated by the braket
     function.
 
-    Attributes:
+    Parameters
+    ----------
         bra: a Wavefunction with the bra part of the braket.
         ket: a Wavefunction with the ket part of the braket.
 
-    Returns:
+    Returns
+    -------
         a double/complex with value of the braket.
  
-    Raises:
+    Raises
+    ------
         DMRGException: if the wavefunction don't belong to the same
-	Hilbert space, i.e. they have a different number of elements.
+	    Hilbert space, i.e. they have a different number of elements.
     """
     # use wf.as_matrix to access the matrix elements of wf
     if bra.as_matrix.shape() != ket.as_matrix.shape():
