@@ -50,7 +50,7 @@ Developer Documentation
    dev_requirements
    tests_docs_and_boring_stuff
    submit_a_bug
-   reference
+   ref/dmrg101
 
 
 .. [#] I think... It's complicated enough so lawyers can make a living.
