@@ -1,13 +1,16 @@
-'''
-File: exceptions.py
-Author: Ivan Gonzalez
-Description: Exception class for the DMRG code
-'''
+# 
+# File: exceptions.py
+# Author: Ivan Gonzalez
+# 
+"""Exception class for the DMRG code
+"""
 class DMRGException(Exception):
     """A base exception for the DMRG code
     
-    Attributes:
-        msg: a string with a message explaining the error
+    Parameters
+    ----------
+    msg : a string 
+        A message explaining the error
     """
     def __init__(self, msg):
     	super(DMRGException, self).__init__()

@@ -1,11 +1,12 @@
-'''
-File: entropies.py
-Author: Ivan Gonzalez
-Description: Functions to calculate entanglement entropies
-'''
+# 
+# File: entropies.py
+# Author: Ivan Gonzalez
+# 
+"""Functions to calculate entanglement entropies
+"""
+from math import log
 from sys import float_info
 from numpy import vectorize, power
-from math import log
 
 def calculate_xlogx(x, epsilon):
     """Calculates :math:`x\log x` of the argument
@@ -15,12 +16,26 @@ def calculate_xlogx(x, epsilon):
     
     Parameters
     ----------
-        x: a double
-        epsilon: a cut-off to avoid the log going to minus infty.
+    x : a double
+        the argument
+    epsilon : a double 
+        a cut-off to avoid the log going to minus infty.
     
     Returns
     -------
-        a double with xlog(x) if x > epsilon, otherwise returns 0.0.
+    result : a double 
+        xlog(x) if x > epsilon, otherwise returns 0.0.
+
+    Examples
+    --------
+    >>> from dmrg101.core.entropies import calculate_xlogx
+    >>> from sys import float_info
+    >>> eigenval_ok = 0.5
+    >>> print calculate_entropy(eigenval_ok, float_info.epsilon)
+    -0.34657359028
+    >>> eigenval_too_small = 0.0
+    >>> print calculate_entropy(eigenval_too_small, float_info.epsilon)
+    0.0
     """
     result = 0.0
     if x > epsilon:
@@ -40,16 +55,26 @@ def calculate_entropy(reduced_density_matrix_evals):
     .. math::
     	S_{vN}=-\sum_{i}\lambda_{i}ln\lambda{i}
 
-    where :math:`lambda_{i}` are the eigenvalues of the reduced density matrix.
+    where :math:`\lambda_{i}` are the eigenvalues of the reduced density matrix.
     
     Parameters
     ----------
-        reduced_density_matrix_evals: an numpy array with the eigenvalues 
-            of the reduced density matrix.
+    reduced_density_matrix_evals : an numpy array 
+        The eigenvalues (or some of them) of the reduced density matrix.
     
     Returns
     -------
-        a double with the value of the entropy
+    result : a double 
+        The value of the entropy
+
+    Examples
+    --------
+    >>> from dmrg101.core.entropies import calculate_entropy
+    >>> import numpy as np
+    >>> reduced_DM_evals = np.array([0.5, 0.5])
+    >>> s_vN = calculate_entropy(reduced_DM_evals)
+    >>> print s_vN
+    0.69314718056
     """
     vec_xlogx = vectorize(calculate_xlogx)
     result = -sum(vec_xlogx(reduced_density_matrix_evals,
@@ -67,21 +92,36 @@ def calculate_renyi(reduced_density_matrix_evals, n=2):
     The n-th Renyi entanglement entropy is defined as:
     
     .. math::
-    	S_{n}=\frac{1}{1-n}\log\(\sum_{i}\lambda^{n}_{i}\)
+    	S_{n}=\\frac{1}{1-n}ln\left(\sum_{i}\lambda^{n}_{i}\\right)
 
-    where :math:`lambda_{i}` are the eigenvalues of the reduced density matrix.
+    where :math:`\lambda_{i}` are the eigenvalues of the reduced density matrix.
 
     The value for n = 1 corresponds to the Von Neumann entanglement
     entropy.
     
     Parameters
     ----------
-        reduced_density_matrix_evals: an numpy array with the eigenvalues 
-            of the reduced density matrix.
+    reduced_density_matrix_evals : an numpy array 
+        The eigenvalues of the reduced density matrix.
+    n : an int
+        The order of the Renyi entropy.
     
     Returns
     -------
-        a double with the value of the entropy
+    result : a double 
+        The value of the entropy.
+
+    Examples
+    --------
+    >>> from dmrg101.core.entropies import calculate_renyi
+    >>> import numpy as np
+    >>> reduced_DM_evals = np.array([0.5, 0.5])
+    >>> s_2 = calculate_renyi(reduced_DM_evals)
+    >>> print s_2
+    0.69314718056
+    >>> s_3 = calculate_renyi(reduced_DM_evals, 3)
+    >>> print s_3
+    0.69314718056
     """
     result = 0.0
     if n == 1:
