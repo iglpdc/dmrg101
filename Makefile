@@ -16,14 +16,18 @@ install:
 # all together in a python distribution that you can tag and upload to
 # github.
 #
-.PHONY: test requires doc dist
+.PHONY: test requires doc api-doc dist 
 test: 
 	nosetests tests
+	nosetests --with-doctest 
 
 requires:
 	pip freeze > requirements.txt
 
-doc: 	
+api-doc:
+	sphinx-apidoc -o docs/ref dmrg101/
+
+doc: api-doc 	
 	cd docs && make html && cd ..
 
 dist:
