@@ -1,8 +1,9 @@
-'''
-File: truncation_error.py
-Author: Ivan Gonzalez
-Description: A function to calculate the truncation error
-'''
+# 
+# File: truncation_error.py
+# Author: Ivan Gonzalez
+#
+"""A module to calculate the truncation error
+"""
 def calculate_truncation_error(reduced_density_matrix_evals):
     """Calculates the DMRG truncation error
     
@@ -14,16 +15,18 @@ def calculate_truncation_error(reduced_density_matrix_evals):
     	
     	\epsilon = 1 - \sum_{i}\lambda_{i}
     
-    where :math:`lambda_{i}` are the eigenvalues of the density matrix
+    where :math:`\lambda_{i}` are the eigenvalues of the density matrix
     that are kept.
     
     Parameters
     ----------
-        reduced_density_matrix_evals: a numpy array with the
-            reduced density matrix eigenvalues *kept*.
+    reduced_density_matrix_evals : a numpy array with ndim = 1.
+        The reduced density matrix eigenvalues *kept*.
     
     Returns
     -------
-        a double with the truncation error
+    result : a double 
+        The truncation error
     """
-    return 1.0-sum(reduced_density_matrix_evals)
+    result = 1.0-sum(reduced_density_matrix_evals)
+    return result
