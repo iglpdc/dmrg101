@@ -159,8 +159,8 @@ class Wavefunction(object):
         >>> from dmrg101.core.wavefunction import Wavefunction
 	>>> wf = Wavefunction(2, 2)
 	>>> wf.randomize()
-	>>> print wf.as_matrix # doctest:+ELLIPSIS
-	...
+	>>> print wf.as_matrix # doctest: +ELLIPSIS
+	[[...
 	>>> norm = wf.get_norm()
 	>>> print norm
 	1.0
