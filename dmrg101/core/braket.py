@@ -4,7 +4,7 @@
 #
 """A module to implement quantum-mechanics brakets.
 """
-from numpy import inner, conjugate
+import numpy as np
 from dmrg_exceptions import DMRGException
 
 def braket(bra, ket):
@@ -37,19 +37,27 @@ def braket(bra, ket):
 
     Examples
     --------
+    >>> import numpy as np
     >>> from dmrg101.core.wavefunction import Wavefunction
     >>> from dmrg101.core.braket import braket
-    >>> bra = Wavefunction(2,1)
-    >>> bra.randomize()
-    >>> ket = Wavefunction(2,1)
-    >>> ket.randomize()
-    >>> print bra, ket
+    >>> bra = Wavefunction(2, 1)
+    >>> bra.as_matrix = np.array([[ 1.], [1.]])
+    >>> print bra.as_matrix
+    [[ 1.]
+     [ 1.]]
+    >>> ket = Wavefunction(2, 1)
+    >>> ket.as_matrix = np.array([[ 1.], [-1.]])
+    >>> print ket.as_matrix
+    [[ 1.]
+     [-1.]]
     >>> print braket(bra, ket)
+    0.0
+    >>> print braket(bra, bra)
+    2.0
     """
     # use wf.as_matrix to access the matrix elements of wf
-    if bra.as_matrix.shape() != ket.as_matrix.shape():
+    if bra.as_matrix.shape != ket.as_matrix.shape:
 	raise DMRGException("Wavefunctions are not in the same Hilbert space")
 
-    hermitian_conjugated_bra=conjugate(bra.as_matrix).transpose()
-    result = inner(hermitian_conjugated_bra, ket.as_matrix)
+    result = np.vdot(bra.as_matrix, ket.as_matrix)
     return result
