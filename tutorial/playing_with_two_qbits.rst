@@ -72,7 +72,19 @@ for the entropy. The following code makes this:
     :pyobject: main
 
 See :download:`a full implementation of the above code
-<solutions/two_qbit_system.py>`.
+<solutions/two_qbit_system.py>`. If you run the code in that file you show
+get something like this: 
+::
+    (dmrg101) $ python solutions/two_qbit_system 
+    The maximum value for entropy is 0.693147.
+    The wavefunction with max entropy is: 
+    [[ 0.          0.70710678]
+     [ 0.70710678  0.        ]]
+    The whole list of psi vs entropies is: 
+    ...
+
+Which is are in fact the entropy (:math:`log(2)`) and wavefunction of the
+singlet.
 
 Conclusion
 ----------
