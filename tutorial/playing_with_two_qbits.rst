@@ -1,29 +1,12 @@
-Playing with a spin
-===================
+Playing with a two-qbit system
+==============================
 
-The goal of this exercise is to build the wavefunction of a single spin
-one-half (a.k.a. a qubit), and calculate its entanglement entropy. This is
-a pretty trivial exercises that you could do without much hassle in a
-piece of paper (see below.) The purpose of the exercise is just get you
+The goal of this exercise is to build the wavefunction of a pair of spins
+one-half (a.k.a. a pair of qbits), and calculate its entanglement
+entropy. This is a pretty trivial exercise that you could do without much
+hassle in a piece of paper (see below.) The purpose is just get you
 familiar with how things are done in the code before moving to bigger
 adventures.
-
-The most general wavefunction of a spin one-half is simply:
-
-.. math::
-    |phi\rangle = \cos \psi |\down_arrow\rangle + \sin \psi |\up_arrow\rangle = 
-    \begin{pmatrix} \cos \psi \\ \sin\psi \end{pmatrix}
-
-The reduced density matrix obtaning by tracing out the right spin is:
-
-.. math::
-    |phi\rangle = \cos \psi |\down_arrow\rangle + \sin \psi |\up_arrow\rangle = 
-    \begin{pmatrix} \cos \psi \\ \sin\psi \end{pmatrix}
-
-The reduced density matrix is an hermitian operator, so it can be
-diagonalized. With the eigenvalues of the reduced density matrix one can
-calculate various quantities that quantify entanglement, such as the Von
-Neumann entanglement entropy.
 
 Exercise 
 -------- 
@@ -42,7 +25,7 @@ system. In dmrg101 the wavefunctions are represented as matrices instead
 of vectors, which may be more familiar to you. 
 
 The reason for that is that as in DMRG we always have to split the
-physical systems (say a chain of spins, or the two spins of the problems)
+physical systems (say a chain of spins, or the two spins of the problem)
 in left and right subsystems, the notation with matrices is more suited.
 In the dmrg101 code the rows of the matrix representing a wavefunction
 correspond to states of the left subsystem, and the columns correspond to
@@ -56,34 +39,55 @@ will correspond to states with the left (right) spin up. The choice of
 whether the first or second row corresponds to spin down or up is
 arbitrary, but once you made the choice you have to be consistent.
 
-The following code (assume that phi was given a value at some point)
-is the wavefunction for our two-spin system.
+If we restrict ourselves to the :math:`S_{tot}=0` subspace, the most general 
+wavefunction for the two qbit systems is simply:
 
+.. math::
+    |\psi\rangle = \cos \phi |\downarrow\uparrow\rangle 
+    + \sin \phi |\uparrow\downarrow\rangle = 
+    \begin{pmatrix} 0 & \cos \phi \\ \sin\phi & 0 \end{pmatrix}
 
 Solution
 --------
 
-The plan is the following. First we are going to create a list of
-wavefunctions for a bunch of different values of phi. 
+The plan is the following. First we are going to write a function to
+calculate the wavefunction for the two-qbit system as a function of the
+an angle `psi`:
 
+.. literalinclude:: ./solutions/two_qbit_system.py
+    :pyobject: create_two_qbit_system_in_singlet
 
-Now we are going to calculate the reduced density matrix tracing out the
-right system
+Now we are going to get the reduced density matrix tracing out the
+left qbit and calculate the corresponding entanglement entropy:
+
+.. literalinclude:: ./solutions/two_qbit_system.py
+    :pyobject: trace_out_left_qbit_and_calculate_entropy
+
+Now it just a matter to generate a bunch of different values for `psi`,
+calculate the corresponding wavefunction with the first function above,
+and pass the wavefunction to the second funciton above to get the value
+for the entropy. The following code makes this:
+
+.. literalinclude:: ./solutions/two_qbit_system.py
+    :pyobject: main
+
+See :download:`a full implementation of the above code
+<solutions/two_qbit_system.py>`.
 
 Conclusion
 ----------
 
 It is important that you note that this is the general solution for a
-system of two qubits, and that two-qubits cannot be more entangled that in
+system of two qbits, and that two-qbits cannot be more entangled that in
 the singlet state. In system of many particles is splitted in two parts
 (think in a larger chain of spins cut at some point in two), one can
 always represent the relevant degrees of freedom at the cut as a set of
-qubits. Then it follows from the result you just proved that the most
+qbits. Then it follows from the result you just proved that the most
 *economical* way of representing the entanglement across the cut is to map
-the degrees of freedom of each side to a qubits and *maximally entangle*
-them across the cut. Any other state to be formed with the qubits in one
+the degrees of freedom of each side to a qbits and *maximally entangle*
+them across the cut. Any other state to be formed with the qbits in one
 side and the other, will either have less entanglement across the cut than
-the one in the original degrees of freedom, or use more qubits at each
+the one in the original degrees of freedom, or use more qbits at each
 side of the cut. This is the basis of the mappings used in quantum
 information methods like MPS or TNS, and you will see *maximally entangled
 spins/qbits* a lot in the rest of the school.

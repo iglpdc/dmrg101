@@ -29,20 +29,20 @@ Warmup
 ------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
   
    how_to_use_the_tutorial
-   playing_with_a_spin
-   ground_states_have_little_entanglement
-   solving_for_a_spin_singlet
+   playing_with_two_qbits
+   heisenberg_model_for_two_spins
+   heisenberg_model_for_n_spins
+.. ground_states_have_little_entanglement
 
 Spin systems
 ------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   exact_solution_for_n_spins
    dmrg_for_heisenberg_chain
    cashout_dmrg_for_tfim
 
@@ -50,7 +50,7 @@ Electronic systems
 ------------------
    
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
     warmup_build_a_electron_site
     dmrg_for_hubbard_chain
@@ -58,7 +58,7 @@ Electronic systems
 Time dependence
 ---------------
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    warmup_create_an_extra_electron
    spin_charge_separation
