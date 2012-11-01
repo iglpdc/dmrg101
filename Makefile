@@ -19,7 +19,7 @@ install:
 .PHONY: test requires doc api-doc dist 
 test: 
 	nosetests tests
-	nosetests --with-doctest 
+	nosetests --with-doctest --doctest-options='+ELLIPSIS'
 
 requires:
 	pip freeze > requirements.txt
