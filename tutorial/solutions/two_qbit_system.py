@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """ Calculates the entanglement entropy of a two qbit system
 
     Calculates the von Neumann entanglement entropu of a system of two
