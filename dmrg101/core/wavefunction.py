@@ -70,6 +70,30 @@ class Wavefunction(object):
 	------
 	DMRGException 
 	    if the name for the block to be traced out is not correct.
+
+	Examples
+	--------
+	>>> import numpy as np
+	>>> from dmrg101.core.wavefunction import Wavefunction
+	>>> # a wf for a system with one state in the left Hilbert space
+	>>> # (number of rows), and two states in the right Hilbert space
+	>>> # (number of columns): just for demostration purposes.
+	>>> wf = Wavefunction(1, 2)
+	>>> wf.as_matrix = np.array([[1. ], [2. ]])
+	>>> print wf.as_matrix
+	[[ 1.]
+	 [ 2.]]
+	>>> # note that it's normalized, which is wrong, but 
+	>>> # allows to keep track of what's going on.
+	>>> reduced_DM_for_left = wf.build_reduced_density_matrix('right')
+	>>> print reduced_DM_for_left
+	[[ 1.  2.]
+         [ 2.  4.]]
+	>>> # i.e. we traced out the left block, so it's a 2x2 matrix.
+	>>> reduced_DM_for_right = wf.build_reduced_density_matrix('left')
+	>>> print reduced_DM_for_right
+	[[ 5.]]
+	>>> # i.e. we traced out the right block, so it's a 1x1 matrix.
 	"""
 	if block_to_be_traced_over not in ('left', 'right'):
 	    raise DMRGException("block_to_be_traced_over must be left "
@@ -77,7 +101,7 @@ class Wavefunction(object):
 	
 	result=np.array(self.as_matrix.dtype.name)
 
-	if (block_to_be_traced_over == 'left'):
+	if block_to_be_traced_over == 'left':
 	    result = np.dot(np.transpose(self.as_matrix), self.as_matrix)
 	else:
 	    result = np.dot(self.as_matrix, np.transpose(self.as_matrix))
