@@ -1,8 +1,10 @@
-'''
-File: wavefunction.py
-Author: Ivan Gonzalez
-Description: The class for wavefunctions
-'''
+# 
+# File: wavefunction.py
+# Author: Ivan Gonzalez
+#
+""" A module for the wavefunctions.
+"""
+from math import sqrt
 import numpy as np
 from dmrg_exceptions import DMRGException
 from braket import braket
@@ -15,12 +17,6 @@ class Wavefunction(object):
     left block, and the columns corresponding to the states of the
     right block. 
     
-    Parameters
-    ----------
-        left_dim: an int with the dimension of the Hilbert space of the left block
-        right_dim: an int with the dimension of the Hilbert space of the right block
-	num_type: a type (double, complex) with the type of the
-	    wavefunction matrix elements.
     """
     def __init__(self, left_dim, right_dim, num_type='double'):
     	"""Creates an empty wavefunction
@@ -28,11 +24,20 @@ class Wavefunction(object):
     	The wavefunction has the correct dimensions, but their
     	contents are garbage. You *must* give it a value before use it for
 	any calculation.
+
+        Parameters
+        ----------
+        left_dim : an int 
+            The dimension of the Hilbert space of the left block
+        right_dim : an int 
+            The dimension of the Hilbert space of the right block
+        num_type : a double or complex 
+            The type of the wavefunction matrix elements.
     
     	Raises
 	------
-    	    DMRGException: if the left_dim, right_dim are not
-    	    integers.
+    	DMRGException 
+	    if the left_dim, right_dim are not integers or bad args.
     	"""
     	super(Wavefunction, self).__init__()
     	try:
@@ -40,6 +45,7 @@ class Wavefunction(object):
     				       num_type)
     	except TypeError:
     	    raise DMRGException("Bad args for wavefunction")
+
     	self.left_dim = left_dim
     	self.right_dim = right_dim
 
@@ -52,21 +58,22 @@ class Wavefunction(object):
 
 	Parameters
 	----------
-	    block_to_be_traced_over: a string with which block (left or
-	    right) will be traced over.
+        block_to_be_traced_over : a string 
+	    Which block (left or right) will be traced over.
 
  	Returns
 	-------
-	    a square and hermitian matrix with the reduced DM.
+	result : a numpy array with ndim = 2 
+	    Which is an hermitian matrix with the reduced DM.
 
         Raises
 	------
-	    DMRGException if the name for the block to be traced out is 
-	        not correct
+	DMRGException 
+	    if the name for the block to be traced out is not correct.
 	"""
 	if block_to_be_traced_over not in ('left', 'right'):
-	    raise DMRGException("block_to_be_traced_over must be left
-	 		         or right")
+	    raise DMRGException("block_to_be_traced_over must be left "
+	 		         "or right")
 	
 	result=np.array(self.as_matrix.dtype.name)
 
@@ -85,30 +92,53 @@ class Wavefunction(object):
 
 	Returns
 	-------
-	    a double with the norm of the wavefunction
+	result : a double 
+	    The norm of the wavefunction
+
+	See Also
+	--------
+	normalize
 	"""
-	norm_squared=braket(self, self)
+	norm_squared = braket(self, self)
 
 	# get rid of the complex part, which should be 0.0, for complex wfs
-	if self.as_matrix.iscomplexobj():
-	    norm_squared=double(norm_squared.real)
+	if np.iscomplexobj(self.as_matrix):
+	    norm_squared = double(norm_squared.real)
 
-	return sqrt(norm_squared)
+	result = sqrt(norm_squared)
+	return result
 
     def normalize(self):
 	""" Normalizes the wavefunction
 
-	Postcond
-	--------
-	    The wavefunction is normalized, i.e. changes to have norm
-	    1.0.
-
 	Raises
 	------
-	    DMRGException: if the norm of the wavefunction is zero.
+	DMRGException 
+	    if the norm of the wavefunction is zero.
+
+	Notes
+	-----
+	Postcond : The wavefunction is normalized, i.e. changes to have norm 1.0.
+
+	Examples
+	--------
+	>>> import numpy as np
+        >>> from dmrg101.core.wavefunction import Wavefunction
+	>>> wf = Wavefunction(2, 2)
+	>>> wf.as_matrix = np.ones((2, 2))
+	>>> print wf.as_matrix
+	[[ 1.  1.]
+         [ 1.  1.]]
+	>>> wf.normalize()
+	>>> print wf.as_matrix
+	[[ 0.5  0.5]
+         [ 0.5  0.5]]
+	>>> norm = wf.get_norm()
+	>>> print norm
+	1.0
 	"""
 	try:
-	    self.as_matrix/=get_norm(self)
+	    self.as_matrix/=self.get_norm()
 	except ValueError:
 	    raise DMRGException("Wavefunction norm is zero")
 
@@ -120,10 +150,20 @@ class Wavefunction(object):
 	The old elements of the wavefunction (if there were any) are
 	lost after using this function.
 
-	Postcond
+	Notes
+	-----
+	Postcond : The wavefunction is filled with random elements and has norm 1.0.
+
+	Examples
 	--------
-	    The wavefunction is filled with random elements and has norm
-	    1.0.
+        >>> from dmrg101.core.wavefunction import Wavefunction
+	>>> wf = Wavefunction(2, 2)
+	>>> wf.randomize()
+	>>> print wf.as_matrix # doctest:+ELLIPSIS
+	...
+	>>> norm = wf.get_norm()
+	>>> print norm
+	1.0
 	"""
-	self.as_matrix=np.random(self.left_dim, self.right_dim)
+	self.as_matrix=np.random.rand(self.left_dim, self.right_dim)
 	self.normalize()
