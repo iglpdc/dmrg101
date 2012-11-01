@@ -27,6 +27,16 @@ def calculate_truncation_error(reduced_density_matrix_evals):
     -------
     result : a double 
         The truncation error
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from dmrg101.core.truncation_error import calculate_truncation_error
+    >>> evals = np.array([0.1, 0.2, 0.3, 0.4])
+    >>> last_three_evals = evals[:-3]
+    >>> truncation_error = calculate_truncation_error(last_three_evals)
+    >>> print truncation_error
+    0.9
     """
     result = 1.0-sum(reduced_density_matrix_evals)
     return result
