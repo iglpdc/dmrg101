@@ -6,6 +6,8 @@
 
     Implements the solution to the first warmup exercises of the tutorial.
 """
+import sys, os
+sys.path.insert(0, os.path.abspath('../..'))
 from math import cos, sin, pi
 from dmrg101.core.entropies import calculate_entropy
 from dmrg101.core.reduced_DM import diagonalize
@@ -30,10 +32,10 @@ def create_two_qbit_system_in_singlet(psi):
     result = Wavefunction(2, 2)
 
     # set the different components.
-    result[0, 0] = 0.
-    result[0, 1] = cos(psi)
-    result[1, 0] = sin(psi)
-    result[1, 1] = 0.
+    result.as_matrix[0, 0] = 0.
+    result.as_matrix[0, 1] = cos(psi)
+    result.as_matrix[1, 0] = sin(psi)
+    result.as_matrix[1, 1] = 0.
     return result
 
 def trace_out_left_qbit_and_calculate_entropy(wf):
@@ -64,11 +66,12 @@ def main():
     singlet state.
     """
     # 
-    # get a bunch of values (50) for psi, and calculate the entropies
+    # get a bunch of values (number_of_psi) for psi
     #
-    psi_values = range(50) # [0, 1, 2, ... 49]
-    psi_values /= (2*pi/len(psi_values)) # [0., 2*pi/50, 4*pi/50, ...]
-    # 
+    number_of_psi = 1000
+    step = 2*pi/number_of_psi
+    psi_values = [x*step for x in range(number_of_psi)] 
+    #
     # python function map applies a function to a sequence
     #
     wfs = map(create_two_qbit_system_in_singlet, psi_values)
@@ -83,9 +86,10 @@ def main():
     #
     print "The maximum value for entropy is %8.6f." %max_value[1]
     print "The wavefunction with max entropy is: "
-    print create_two_qbit_system_in_singlet(max_value[0])
+    print create_two_qbit_system_in_singlet(max_value[0]).as_matrix
     print "The whole list of psi vs entropies is: "
-    print "%8.6, %8.6" %zipped[0], %zipped[1]
+    #print "%8.6, %8.6" %(zipped[0], zipped[1])
+    #print zipped
 
 if __name__ == '__main__':
     main()
