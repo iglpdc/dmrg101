@@ -38,23 +38,25 @@ def diagonalize(reduced_density_matrix):
     >>> import numpy as np
     >>> from dmrg101.core.reduced_DM import diagonalize
     >>> symmetric_matrix = np.array([[0.8, 0.5],
-                                     [0.5, -0.25]])
+    ...                              [0.5, -0.25]])
     >>> evals, evecs = diagonalize(symmetric_matrix)
     >>> print evals
-    [-0.45 1.0 ]
-    >>> tmp = np.dot(evecs, s)
+    [-0.45  1.  ]
+    >>> tmp = np.dot(evecs, symmetric_matrix)
     >>> evecs_diagonalize_the_matrix = np.dot(tmp, evecs.transpose())
-    [[ -0.45  0.0 ]
-     [  0.0   1.0 ]]    
+    >>> print evecs_diagonalize_the_matrix
+    [[ -0.45  0. ]
+     [  0.   1. ]]    
     >>> hermitian_matrix = np.array([[0.0, -1.0j],
-                                     [1.0j, 0.0]], dtype=complex)
+    ...                              [1.0j, 0.0]], dtype=complex)
     >>> evals, evecs = diagonalize(hermitian_matrix)
     >>> print evals
-    [-1. 1.]
-    >>> tmp = np.dot(evecs, s)
-    >>> evecs_diagonalize_the_matrix = np.dot(tmp, evecs.transpose())
-    [[ -1.0  0.0 ]
-     [  0.0  1.0 ]]    
+    [-1.  1.]
+    >>> tmp = np.dot(evecs, hermitian_matrix)
+    >>> evecs_diagonalize_the_matrix = np.dot(tmp, np.conj(evecs.transpose()))
+    >>> print evecs_diagonalize_the_matrix
+    [[ -1.  0.  ]
+     [  0.  1.  ]]    
     """
     try:
         eigenvals, eigenvecs = np.linalg.eigh(reduced_density_matrix)	
@@ -85,20 +87,20 @@ def truncate(reduced_density_matrix_eigenvals,
     
     Parameters
     ----------
-    reduced_density_matrix_eigenvals: a numpy array with ndim = 1
+    reduced_density_matrix_eigenvals : a numpy array with ndim = 1
         The eigenvalues of the reduced density matrix (not need to be
 	ordered).
-    reduced_density_matrix_eigenvecs: a numpy array with ndim = 2
+    reduced_density_matrix_eigenvecs : a numpy array with ndim = 2
         The eigenvectors of the reduced density matrix.
-    number_of_states_to_keep: an int 
+    number_of_states_to_keep : an int 
         The number of eigenvalues (or eigenvectors) kept. It is the same
 	as the dimension of the truncated Hilbert space.
     
     Returns
     -------
-    truncated_eigenvals: a numpy array with ndim = 1.
+    truncated_eigenvals : a numpy array with ndim = 1.
         The eigenvalues kept in the same order as before.
-    transformation_matrix: a numpy array with ndim = 2.
+    transformation_matrix : a numpy array with ndim = 2.
         The eigenvectors kept. this defines the DMRG transformation (a.k.a.
         truncation) matrix.
 
@@ -113,12 +115,12 @@ def truncate(reduced_density_matrix_eigenvals,
     >>> import numpy as np
     >>> from dmrg101.core.reduced_DM import diagonalize, truncate
     >>> already_diag = np.array([[ 2.0, 0.0, 0.0 ],
-    			         [ 0.0, 1.0, 0.0 ],
-    			         [ 0.0, 0.0, 3.0 ]])
+    ...			         [ 0.0, 1.0, 0.0 ],
+    ...			         [ 0.0, 0.0, 3.0 ]])
     >>> evals, evecs = diagonalize(already_diag)
-    >>> truncated_evals, truncation_matrix = truncate(evecs, evals, 2) 
+    >>> truncated_evals, truncation_matrix = truncate(evals, evecs, 2) 
     >>> print truncated_evals
-    [ 2. 3.]
+    [ 2.  3.]
     >>> print truncation_matrix
     [[ 1.  0.]
      [ 0.  0.]
