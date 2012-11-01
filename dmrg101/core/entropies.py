@@ -31,10 +31,10 @@ def calculate_xlogx(x, epsilon):
     >>> from dmrg101.core.entropies import calculate_xlogx
     >>> from sys import float_info
     >>> eigenval_ok = 0.5
-    >>> print calculate_entropy(eigenval_ok, float_info.epsilon)
+    >>> print calculate_xlogx(eigenval_ok, float_info.epsilon)
     -0.34657359028
     >>> eigenval_too_small = 0.0
-    >>> print calculate_entropy(eigenval_too_small, float_info.epsilon)
+    >>> print calculate_xlogx(eigenval_too_small, float_info.epsilon)
     0.0
     """
     result = 0.0
