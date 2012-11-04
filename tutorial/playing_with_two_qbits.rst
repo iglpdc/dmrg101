@@ -40,7 +40,7 @@ whether the first or second row corresponds to spin down or up is
 arbitrary, but once you made the choice you have to be consistent.
 
 If we restrict ourselves to the :math:`S_{tot}=0` subspace, the most general 
-wavefunction for the two qbit systems is simply:
+wavefunction for the two qbit systems is simply [#]_:
 
 .. math::
     |\psi\rangle = \cos \phi |\downarrow\uparrow\rangle 
@@ -72,10 +72,10 @@ for the entropy. The following code makes this:
     :pyobject: main
 
 See :download:`a full implementation of the above code
-<solutions/two_qbit_system.py>`. If you run the code in that file you show
+<solutions/two_qbit_system.py>`. If you run that code you should
 get something like this: 
 ::
-    (dmrg101) $ python solutions/two_qbit_system 
+    (dmrg101) $ python tutorial/solutions/two_qbit_system.py
     The maximum value for entropy is 0.693147.
     The wavefunction with max entropy is: 
     [[ 0.          0.70710678]
@@ -103,3 +103,7 @@ the one in the original degrees of freedom, or use more qbits at each
 side of the cut. This is the basis of the mappings used in quantum
 information methods like MPS or TNS, and you will see *maximally entangled
 spins/qbits* a lot in the rest of the school.
+
+.. [#] There could be an extra phase between the two components, but it
+    cancels out later, so we don't bother to include it.
+
