@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 """ Calculates the entanglement entropy of a two qbit system
 
-    Calculates the von Neumann entanglement entropu of a system of two
-    spin one-half spins restricted to the subspace of total spin equal to
-    zero. 
+Calculates the von Neumann entanglement entropu of a system of two
+spin one-half spins restricted to the subspace of total spin equal to
+zero. 
 
-    Implements the solution to the first warmup exercises of the tutorial.
+Implements the solution to the first warmup exercises of the tutorial.
 """
 import sys, os
 sys.path.insert(0, os.path.abspath('../..'))
@@ -88,9 +88,15 @@ def main():
     print "The maximum value for entropy is %8.6f." %max_value[1]
     print "The wavefunction with max entropy is: "
     print create_two_qbit_system_in_singlet(max_value[0]).as_matrix
-    print "The whole list of psi vs entropies is: "
-    #print "%8.6, %8.6" %(zipped[0], zipped[1])
-    #print zipped
+    #
+    # save for plotting
+    #
+    filename = 'two_qbit_entropies.dat'
+    f = open(filename, 'w')
+    f.write('\n'.join('%s %s' % x for x in zipped))
+    f.close()
+    print "The whole list of psi vs entropies is saved in",
+    print filename+'.'
 
 if __name__ == '__main__':
     main()
