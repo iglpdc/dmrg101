@@ -5,8 +5,10 @@ Calculates the ground state energy and wavefunction for the
 antiferromagnetic Heisenberg model for a system of two spin one-half. The
 calculation of the ground state is done using the Lanczos algorithm.
 """
+import sys, os
+sys.path.insert(0, os.path.abspath('../..'))
 from dmrg101.core.lanczos import calculate_ground_state
-from dmrg101.core.operators import Operator
+from dmrg101.core.operators import CompositeOperator
 from dmrg101.core.sites import SpinOneHalfSite
 
 def build_HAF_hamiltonian_for_two_spins(left_spin, right_spin):
@@ -30,7 +32,7 @@ def build_HAF_hamiltonian_for_two_spins(left_spin, right_spin):
 	operators are not found in the site, but I'll leave without it
 	because it just makes the code more complicated to read.
     """
-    result = Operator(left_spin.dim, right_spin.dim)
+    result = CompositeOperator(left_spin.dim, right_spin.dim)
     result.add(left_spin.operators['s_z'], right_spin.operators['s_z'])
     result.add(left_spin.operators['s_p'], right_spin.operators['s_m'], .5)
     result.add(left_spin.operators['s_m'], right_spin.operators['s_p'], .5)
@@ -51,9 +53,9 @@ def main():
     #
     # print results
     #
-    print "The ground state energy is %8.6f.", %ground_state_energy
-    print "The ground state wavefunction is :",
-    print ground_state_wf
+    print "The ground state energy is %8.6f." %ground_state_energy
+    print "The ground state wavefunction is :"
+    print ground_state_wf.as_matrix
 
 if __name__ == '__main__':
     main()
