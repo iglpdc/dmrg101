@@ -1,7 +1,7 @@
 DMRG101
 =======
 
-A pedagogical implementation in Python of the [Denstiy Matrix Renormalization Group (DMRG)] (http://en.wikipedia.org/wiki/Density_matrix_renormalization_group) algorithm for the [Taipei DMRG Winter School](https://sites.google.com/site/dmrg101/).
+A pedagogical implementation in Python of the [Density Matrix Renormalization Group (DMRG)] (http://en.wikipedia.org/wiki/Density_matrix_renormalization_group) algorithm for the [Taipei DMRG Winter School](https://sites.google.com/site/dmrg101/).
 
 This repository hosts the materials for the tutorials on the DMRG algorithm
 used in the school. You will find here an implementation of the DMRG
