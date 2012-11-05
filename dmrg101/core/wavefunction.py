@@ -162,7 +162,7 @@ class Wavefunction(object):
 	1.0
 	"""
 	try:
-	    self.as_matrix/=self.get_norm()
+	    self.as_matrix /= self.get_norm()
 	except ValueError:
 	    raise DMRGException("Wavefunction norm is zero")
 
@@ -189,5 +189,22 @@ class Wavefunction(object):
 	>>> print norm
 	1.0
 	"""
-	self.as_matrix=np.random.rand(self.left_dim, self.right_dim)
+	self.as_matrix = np.random.rand(self.left_dim, self.right_dim)
 	self.normalize()
+    
+    def set_to_zero(self):
+        """Fills the wavefunction with all zeros.
+
+	You use this function as a helper in cases when you need a
+	wavefunction just full of zeros.
+
+	Examples
+	--------
+        >>> from dmrg101.core.wavefunction import Wavefunction
+	>>> wf = Wavefunction(2, 2)
+	>>> wf.set_to_zero()
+	>>> print wf.as_matrix
+	[[ 0.  0.]
+         [ 0.  0.]]
+	"""
+	self.as_matrix = np.zeros((self.left_dim, self.right_dim))
