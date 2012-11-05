@@ -5,9 +5,7 @@ Sphinx==1.1.3
 Twisted==12.0.0
 altgraph==0.9
 bdist-mpkg==0.4.4
-bonjour-py==0.3
 docutils==0.9.1
-ipython==0.13
 macholib==1.4.2
 matplotlib==1.1.1
 modulegraph==0.9.1
