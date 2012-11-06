@@ -9,6 +9,37 @@ import numpy as np
 from dmrg_exceptions import DMRGException
 from braket import braket
 
+def create_empty_like(wf):
+    """Creates an new wavefunction empty but like the argument.
+
+    You use this function to create wavefunctions with the same shape
+    (i.e. in the same Hilbert space) as a given wavefunction, but with
+    elements full of garbage.
+
+    Parameters
+    ----------
+    wf : a Wavefunction.
+        The wavefunction you want to 'empty_like'.
+    
+    Returns
+    -------
+    result : a Wavefunction.
+        A new wavefunction with the same shape, but full of garbage.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from dmrg101.core.wavefunction import create_empty_like
+    >>> wf = Wavefunction(2, 2)
+    >>> wf.as_matrix = np.eye(2, 2)
+    >>> empty_like_wf = create_empty_like(wf)
+    >>> print (wf.as_matrix.shape == empty_like_wf.as_matrix.shape)
+    True
+    """
+    result = Wavefunction(wf.left_dim, wf.right_dim, wf.num_type)
+    result.as_matrix = np.empty_like(wf.as_matrix)
+    return result
+
 class Wavefunction(object):
     """A wavefunction object
     
@@ -48,6 +79,7 @@ class Wavefunction(object):
 
     	self.left_dim = left_dim
     	self.right_dim = right_dim
+	self.num_type = num_type
 
     def build_reduced_density_matrix(self, block_to_be_traced_over):
 	"""Constructs the reduced DM for this wavefunction.
