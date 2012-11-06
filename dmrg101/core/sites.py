@@ -70,9 +70,10 @@ class Site(object):
 	Notes
 	-----
 	Postcond:
-    	    - `self.operators` has one item more, and
-   	    - the newly created operator is a (`self.dim`, `self.dim`)
-	      matrix of full of zeros.
+
+        - `self.operators` has one item more, and
+        - the newly created operator is a (`self.dim`, `self.dim`)
+          matrix of full of zeros.
 	
 	Examples
 	--------
@@ -107,7 +108,7 @@ class SpinOneHalfSite(Site):
 
     Notes
     -----
-        Postcond : The site has already built-in the spin operators for s_z, s_p, s_m.
+    Postcond : The site has already built-in the spin operators for s_z, s_p, s_m.
 
     Examples
     --------
@@ -133,8 +134,8 @@ class SpinOneHalfSite(Site):
 
 	Notes
 	-----
-	    Postcond : the dimension is set to 2, and the Pauli matrices
-	    are added as operators.
+	Postcond : the dimension is set to 2, and the Pauli matrices
+	are added as operators.
 	"""
         super(SpinOneHalfSite, self).__init__(2)
 	# add the operators
@@ -157,25 +158,27 @@ class ElectronicSite(Site):
     
     You use this site for models where the single sites are electron
     sites. The Hilbert space is ordered such as:
-        - the first state, labelled 0,  is the empty site,
-	- the second, labelled 1, is spin down, 
-	- the third, labelled 2, is spin up, and 
-	- the fourth, labelled 3, is double occupancy.
+
+    - the first state, labelled 0,  is the empty site,
+    - the second, labelled 1, is spin down, 
+    - the third, labelled 2, is spin up, and 
+    - the fourth, labelled 3, is double occupancy.
     
     Notes
     -----
     Postcond: The site has already built-in the spin operators for: 
-        - c_up, destroys an spin up electron,
-        - c_up_dag, creates an spin up electron,
-        - c_down, destroys an spin down electron,
-        - c_down_dag, creates an spin down electron,
-        - s_z, component z of spin,
-        - s_p, raises the component z of spin,
-        - s_m, lowers the component z of spin,
-        - n_up, number of electrons with spin up,
-        - n_down, number of electrons with spin down,
-        - n, number of electrons, i.e. n_up+n_down, and
-        - u, number of double occupancies, i.e. n_up*n_down.
+
+    - c_up : destroys an spin up electron,
+    - c_up_dag, creates an spin up electron,
+    - c_down, destroys an spin down electron,
+    - c_down_dag, creates an spin down electron,
+    - s_z, component z of spin,
+    - s_p, raises the component z of spin,
+    - s_m, lowers the component z of spin,
+    - n_up, number of electrons with spin up,
+    - n_down, number of electrons with spin down,
+    - n, number of electrons, i.e. n_up+n_down, and
+    - u, number of double occupancies, i.e. n_up*n_down.
 
     Examples
     --------

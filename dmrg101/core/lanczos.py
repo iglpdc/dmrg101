@@ -2,7 +2,64 @@
 # File: lanczos.py
 # Author: Ivan Gonzalez
 #
-""" Implements the Lanczos algorithm
+""" Implements the Lanczos algorithm.
+
+Implements the Lanczos algorithm to calculate the ground state energy and
+wavefunction of a given Hamiltonian. The objects representing the
+wavefunction and hamiltonian are Wavefunction and OperatorComponent (i.e.
+an Operator or a CompositeOperator), respectively.
+
+Most of the methods here are just convenience functions. The one that
+implements the algorithm is :func:`calculate_ground_state`.
+
+Methods
+-------
+
+- calculate_ground_state_energy(hamiltonian, initial_wf,
+  min_lanczos_iterations, too_many_iterations, precision) : Calculates the
+  ground state energy.
+- calculate_ground_state_wf(hamiltonian, initial_wf,
+- calculate_ground_state(hamiltonian, [initial_wf, min_lanczos_iterations,
+  too_many_iterations, precision]): Calculates the ground state energy and
+  wavefunction.
+- create_lanczos_vectors(initial_wf) : Creates the three Lanczos vectors.
+- cycle_lanczos_vectors(lv, saved_lanczos_vectors) : Cycles the Lanczos
+  vectors to prepare them for the next iteration.
+- diagonalize_tridiagonal_matrix(d, e, eigenvectors) : Diagonalizes the
+  tridiagonal matrix in the Lanczos.
+- improve_ground_state_energy(d, e, current_gs_energy, precision) : Gets
+  an improved value for the ground state energy.
+- generate_tridiagonal_matrix(alpha, beta, iteration) : Generates the
+  elements of the tridiagonal matrix.
+- lanczos_zeroth_iteration(alpha, beta, lv, hamiltonian) : Performs the
+  zero-th iteration for the Lanczos.
+- lanczos_nth_iteration(alpha, beta, lv, saved_lanczos_vectors,
+  hamiltonian, iteration) : Performs the n-th iteration for the Lanczos.
+
+Examples
+--------
+>>> import numpy as np
+>>> from dmrg101.core.operators import CompositeOperator
+>>> from dmrg101.core.lanczos import calculate_ground_state
+>>> s_z = np.array([[-0.5, 0.0],
+...                 [0.0, 0.5]])	    
+>>> one = np.array([[1.0, 0.0],
+...                 [0.0, 1.0]])	    
+>>> ising_fm_in_field = CompositeOperator(2, 2)
+>>> ising_fm_in_field.add(s_z, s_z, -1.0)
+>>> h = 0.1
+>>> ising_fm_in_field.add(s_z, one, -h)
+>>> ising_fm_in_field.add(one, s_z, -h)
+>>> gs_energy, gs_wf = calculate_ground_state(ising_fm_in_field)
+>>> print gs_energy
+-0.27
+>>> print gs_wf 
+[[ 0.  0.]
+[[ 0.  1.]
+
+------------------------------------------------------
+
+.. [1] http://en.wikipedia.org/wiki/Lanczos_algorithm
 """
 import numpy as np
 from math import fabs
@@ -14,7 +71,7 @@ from dmrg101.core.wavefunction import create_empty_like
 from dmrg101.core.wavefunction import Wavefunction
 
 def create_lanczos_vectors(initial_wf):
-    """Creates the three Lanczos vectors
+    """Creates the three Lanczos vectors.
 
     The Lanczos vectors are created empty, but with the proper size and
     type. The first lanczos vector is set to have the same eleements as 
@@ -135,11 +192,11 @@ def lanczos_zeroth_iteration(alpha, beta, lv, hamiltonian):
     return already_the_ground_state
 
 def lanczos_nth_iteration(alpha, beta, lv, saved_lanczos_vectors,
-		          hamiltonian, iiteration):
-    """Performs the zero-th iteration for the Lanczos.
+		          hamiltonian, iteration):
+    """Performs the n-th iteration for the Lanczos.
 
-    The zero-th (i.e. the first at all) Lanczos iteration is slightly
-    different to the rest.
+    It calculates the new values for `alpha` and `beta` for this
+    `iteration`.
 
     Parameters
     ----------
@@ -193,7 +250,7 @@ def cycle_lanczos_vectors(lv, saved_lanczos_vectors):
     lv[0], lv[1], lv[2] = lv[1], lv[2], create_empty_like(lv[2])
 
 def improve_ground_state_energy(d, e, current_gs_energy, precision):
-    """Get an improved value for the ground state energy
+    """Gets an improved value for the ground state energy.
 
     Diagonalizes the tridiagonal matrix and find its lowest eigenvalues.
     Then checks whether this lowest eigenvalue imrproves the current
@@ -221,7 +278,7 @@ def improve_ground_state_energy(d, e, current_gs_energy, precision):
     """
     evals, evecs = diagonalize_tridiagonal_matrix(d, e)
     minimum_eval = min(evals)
-    if current_gs_energy not None:
+    if current_gs_energy is not None:
         difference_with_current = fabs(current_gs_energy - minimum_eval)
         acceptable_difference = precision * fabs(current_gs_energy)
         does_not_improve_anymore = (difference_with_current < acceptable_difference)
@@ -296,7 +353,7 @@ def calculate_ground_state_energy(hamiltonian, initial_wf,
     else: # initial_wf *is* the ground state
 	gs_energy = alpha[0]
   
-    assert(gs_energy not None)
+    assert(gs_energy is not None)
     return gs_energy, d, e, saved_lanczos_vectors
 
 def calculate_ground_state(hamiltonian, initial_wf = None, 
@@ -332,7 +389,7 @@ def calculate_ground_state(hamiltonian, initial_wf = None,
 			          hamiltonian.right_dim)
 	initial_wf.randomize()
 
-    gs_energy, d, e saved_lanczos_vectors = (
+    gs_energy, d, e, saved_lanczos_vectors = (
         calculate_ground_state_energy(hamiltonian, initial_wf, min_lanczos_iterations, 
 		                      too_many_iterations, precision) )
     gs_wf = calculate_ground_state_wf(d, e, saved_lanczos_vectors)

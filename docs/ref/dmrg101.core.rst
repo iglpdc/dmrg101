@@ -25,6 +25,30 @@ core Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`get_real` Module
+----------------------
+
+.. automodule:: dmrg101.core.get_real
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`lanczos` Module
+---------------------
+
+.. automodule:: dmrg101.core.lanczos
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`operators` Module
+-----------------------
+
+.. automodule:: dmrg101.core.operators
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`reduced_DM` Module
 ------------------------
 
