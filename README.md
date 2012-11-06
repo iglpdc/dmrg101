@@ -13,33 +13,6 @@ interested in learning DMRG, but who were not able to attend the school.
 The computer code is intended to be pedagogical, with less emphasis on
 performance so it's probably not useful for research purposes. 
 
+For more information, take a look to the [documentation for the code and the tutorial] (http://dmrg101.rtfd.org).
+
 *Have fun!*
- 
-Authors
--------
-
-See the AUTHORS file.
-
-License
--------
-
-See the LICENSE file.
-
-Requirements
-------------
-
-To be able to install `dmrg101` in your computer, you need to have Python
-installed and an internet connection to download some extra packages used
-by `dmrg101`. Both Python and all the rest of the packages used by
-`dmrg101` are avaliable for free from the Internet. Find the details under
-the **Install** section.
-
-`dmrg101` will run and install in any operating system (Windows, Linux,
-Mac,...) The packages installed by `dmrg101` are installed in an isolated
-enviroment, so they won't mess up with other versions that you have
-previously installed in your machine.
-
-Install
--------
-
-See the INSTALL file.
