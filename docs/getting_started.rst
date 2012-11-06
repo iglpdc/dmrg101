@@ -12,7 +12,6 @@ you have Windows or want to install a newer version of python interpreter
 Other than that you just need to install an additional python package,
 virtualenv, and grab the code from our public repository. Details follow.
 
-.. _which_version_of_python
 Which version of Python?
 ------------------------
 
@@ -78,10 +77,8 @@ install anything, which may be also an option.
 For further information visit the  `virtualenv's webpage
 <http://www.virtualenv.org/>`_.
 
-
-.. creating_a_virtual_environment_for_dmrg101
-Creating a virtual enviroment for drmg101
------------------------------------------
+Creating a virtual environment for drmg101
+------------------------------------------
 
 To avoid messing with your system-wide python installation, and even if
 you have an adequate version of the python interpreter, we **strongly
@@ -147,13 +144,12 @@ Getting the dmrg101 code
 
 If you didn't do it yet, create and activate the dmrg101 virtual
 enviroment, as described in
-:ref:`creating_a_virtual_environment_for_dmrg101` ::
+`Creating a virtual environment for dmrg101`_ ::
 
         $ cd dmrg101
         $ source bin/activate
 
-Install the dmrg101 package from the dmrg101's GitHub page using ``pip``:
- ::
+Install the dmrg101 package from the dmrg101's GitHub page using ``pip``: ::
         
         (dmrg101) $ pip -e https://iglpdc.github.com/dmrg101/...
 
@@ -164,16 +160,9 @@ Install the extra packages that dmrg101 needs to work: ::
 You will see some stuff being downloaded and installed inside the
 environment. Wait a bit and *you're done installing!*
 
-.. [#] We will use *Python* and *Python interpreter* to mean the same
-        thing: what happens when you type ``python`` in  a console.
-
+.. [#] We will use *Python* and *Python interpreter* to mean the same thing: 
+       what happens when you type ``python`` in  a console.
 .. [#] Whenever you see code to type and the ``$``symbol, means that you
-        have to type this in a console in your computer. You can open a console         in Linux and MacOS open the Terminal application, and in Windows it is 
-        called MS_DOS prompt or Windows command line.
-
-
-
-
-
-
-
+       have to type this in a console in your computer. You can open a console         
+       in Linux and MacOS open the Terminal application, and in Windows it is 
+       called MS_DOS prompt or Windows command line.
