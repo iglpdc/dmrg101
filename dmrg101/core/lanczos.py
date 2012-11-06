@@ -18,7 +18,8 @@ Methods
 - calculate_ground_state_energy(hamiltonian, initial_wf,
   min_lanczos_iterations, too_many_iterations, precision) : Calculates the
   ground state energy.
-- calculate_ground_state_wf(hamiltonian, initial_wf,
+- calculate_ground_state_wf(d, e, saved_lanczos_vectors) : Calculates the
+  ground state wavefunction.
 - calculate_ground_state(hamiltonian, [initial_wf, min_lanczos_iterations,
   too_many_iterations, precision]): Calculates the ground state energy and
   wavefunction.
@@ -84,7 +85,7 @@ def create_lanczos_vectors(initial_wf):
     
     Returns
     -------
-    result : a tuple of 3 numpy arrays.
+    result : a tuple of 3 Wavefunctions.
         The three Lanczos vectors. They have the same shape and type as
 	initial_wf. The first has the same elements (is a copy), and the
 	last two are full of garbage.
@@ -104,9 +105,9 @@ def generate_tridiagonal_matrix(alpha, beta, iteration):
 
     Parameters
     ----------
-    alpha : a numpy array with ndim = 1.
+    alpha : a list of doubles.
         The alpha's in the Lanczos algorithm.
-    beta : a numpy array with ndim = 1.
+    beta : a list of doubles.
         The beta's in the Lanczos algorithm.
     iteration : an int
         The iteration you are, which sets the size of d, e.
@@ -134,10 +135,12 @@ def diagonalize_tridiagonal_matrix(d, e, eigenvectors):
 
     Parameters
     ----------
-    alpha : a numpy array with ndim = 1.
-        The alpha's in the Lanczos algorithm.
-    beta : a numpy array with ndim = 1.
-        The beta's in the Lanczos algorithm.
+    d : a numpy array with ndim = 1.
+        The elements of the diagonal of the tridiagonal matrix. 
+    e : a numpy array with ndim = 1.
+        The off-diagonal elements of the tridiagonal matrix. 
+    eigenvectors : a bool
+        Whether eigenvectors are calculated or not.
   
     Returns
     -------
@@ -200,9 +203,9 @@ def lanczos_nth_iteration(alpha, beta, lv, saved_lanczos_vectors,
 
     Parameters
     ----------
-    alpha : a numpy array with ndim = 1.
+    alpha : a list of doubles.
         The alpha's in the Lanczos algorithm.
-    beta : a numpy array with ndim = 1.
+    beta :  a list of doubles.
         The beta's in the Lanczos algorithm.
     lv : the 3 tuple of Wavefunctions.
         With the three Lanczos vectors in use.
@@ -232,6 +235,7 @@ def cycle_lanczos_vectors(lv, saved_lanczos_vectors):
     """Cycles the Lanczos vectors to prepare them for the next iteration.
 
     You use this function to cycle the Lanczos vectors in this way:
+
     - lv[1] -> lv[0]
     - lv[2] -> lv[1]
 
@@ -253,7 +257,7 @@ def improve_ground_state_energy(d, e, current_gs_energy, precision):
     """Gets an improved value for the ground state energy.
 
     Diagonalizes the tridiagonal matrix and find its lowest eigenvalues.
-    Then checks whether this lowest eigenvalue imrproves the current
+    Then checks whether this lowest eigenvalue improves the current
     ground state energy. 
 
     Parameters
@@ -276,8 +280,8 @@ def improve_ground_state_energy(d, e, current_gs_energy, precision):
     new_gs_energy : a double.
         The new value for the ground state energy.
     """
-    evals, evecs = diagonalize_tridiagonal_matrix(d, e)
-    minimum_eval = min(evals)
+    evals, evecs = diagonalize_tridiagonal_matrix(d, e, False)
+    minimum_eval = np.amin(evals)
     if current_gs_energy is not None:
         difference_with_current = fabs(current_gs_energy - minimum_eval)
         acceptable_difference = precision * fabs(current_gs_energy)
@@ -355,6 +359,42 @@ def calculate_ground_state_energy(hamiltonian, initial_wf,
   
     assert(gs_energy is not None)
     return gs_energy, d, e, saved_lanczos_vectors
+
+def calculate_ground_state_wf(d, e, saved_lanczos_vectors): 
+    """Calculates the ground state wavefunction.
+    
+    Parameters
+    ----------
+    d : a numpy array with ndim = 1.
+        The elements of the diagonal of the tridiagonal matrix. The size
+	of `d` is `iteration`+1.
+    e : a numpy array with ndim = 1.
+        The off-diagonal elements of the tridiagonal matrix. The size of
+	`d` is `iteration`+1.
+    saved_lanczos_vectors : a list of Wavefunctions.
+        The Lanczos vectors that are saved.
+
+    Returns
+    -------
+    result : a Wavefunction.
+        The ground state function.
+    """
+    evals, evecs = diagonalize_tridiagonal_matrix(d, e, True)
+    min_index = np.argsort(evals)[0]
+    # TODO rows or cols?
+    # TODO is flatten neccesary?
+    # get column with index min_index.
+    coefficients_of_gs_in_krylov_space = np.flatten(evecs[:, min_index])
+    assert(len(saved_lanczos_vectors) == len(coefficients_of_gs_in_krylov_space))
+    
+    result = Wavefunction(saved_lanczos_vectors[0].left_dim,
+		          saved_lanczos_vectors[0].right_dim) 
+    result.set_to_zero()
+    for i in range(len(saved_lanczos_vectors)):
+        result.as_matrix += ( coefficients_of_gs_in_krylov_space[i] * 
+		saved_lanczos_vectors[i].as_matrix )
+
+    return result 
 
 def calculate_ground_state(hamiltonian, initial_wf = None, 
 			   min_lanczos_iterations = 3, 
