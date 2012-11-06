@@ -160,9 +160,12 @@ Install the extra packages that dmrg101 needs to work: ::
 You will see some stuff being downloaded and installed inside the
 environment. Wait a bit and *you're done installing!*
 
+----------------------------------------------------------------------------
+
 .. [#] We will use *Python* and *Python interpreter* to mean the same thing: 
        what happens when you type ``python`` in  a console.
-.. [#] Whenever you see code to type and the ``$``symbol, means that you
+
+.. [#] Whenever you see code to type and the "$" symbol, means that you
        have to type this in a console in your computer. You can open a console         
        in Linux and MacOS open the Terminal application, and in Windows it is 
        called MS_DOS prompt or Windows command line.
