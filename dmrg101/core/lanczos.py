@@ -84,7 +84,7 @@ def diagonalize_tridiagonal_matrix(d, e, eigenvectors):
     """
     return evals, evecs
     
-def lanczos_zeroth_iteration(alpha, beta, lv, hamiltonian)
+def lanczos_zeroth_iteration(alpha, beta, lv, hamiltonian):
     """Performs the zero-th iteration for the Lanczos.
 
     The zero-th (i.e. the first at all) Lanczos iteration is slightly
@@ -107,7 +107,7 @@ def lanczos_zeroth_iteration(alpha, beta, lv, hamiltonian)
     beta[1] = lv[1].get_norm() 
     lv[1].normalize()
 
-def lanczos_nth_iteration(alpha, beta, lv, hamiltonian, iteration)
+def lanczos_nth_iteration(alpha, beta, lv, hamiltonian, iteration):
     """Performs the zero-th iteration for the Lanczos.
 
     The zero-th (i.e. the first at all) Lanczos iteration is slightly
@@ -223,7 +223,7 @@ def calculate_ground_state_energy(hamiltonian, initial_wf,
     if beta[1] > float_info.epsilon: # initial_wf is *not* the ground state
         we_are_done = False
         while not we_are_done:
-            iteration++
+            iteration += 1
     	    lanczos_nth_iteration(alpha, beta, lv, hamiltonian, iteration)
     
     	    if iteration >= min_lanczos_iterations:
@@ -238,8 +238,8 @@ def calculate_ground_state_energy(hamiltonian, initial_wf,
     	        max_lanczos_iterations += initial_number_of_iterations
     	        alpha.resize(max_lanczos_iterations)
     	        beta.resize(max_lanczos_iterations)
-     else: # initial_wf *is* the ground state
-	 gs_energy = alpha[0]
+    else: # initial_wf *is* the ground state
+	gs_energy = alpha[0]
  
     return gs_energy, d, e
 
