@@ -33,7 +33,7 @@ install `Git <http://git-scm.com/download>`__.
 
 There are several different ways to install dmrg101, including a quick
 method and a developer method.  For the developer method to access the
-repository, see the `Developer Documentation`.
+repository, see the :ref:`Installation for developers`.
 
 If you are attending the School, you just need to use the quick method
 below.

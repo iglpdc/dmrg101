@@ -1,5 +1,8 @@
-Getting the code
-----------------
+.. _`Installation for developers`:
+
+===========================
+Installation for developers
+===========================
 
 If you are attending the School, you don't need to do this. You still have
 full access to the source code using the :ref:`quick-installation` method.
