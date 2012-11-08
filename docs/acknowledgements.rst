@@ -1,8 +1,7 @@
 Acknowlegdements
 ----------------
 
-We acknowlegde support from MICINN through grant FIS2009-13520 (I.
-Gonzalez).
+We acknowlegde support from MICINN through grant FIS2009-13520 (IG).
 
 This code was developed as part of the `Taipei Density Matrix Renormalization Group
 Winter School <http://sites.google.com/site/dmrg101/home>`_. This school

@@ -14,42 +14,41 @@ suitable for realistic research projects. dmrg101 was developed to be used
 as a tutorial code for the `Taipei Density Matrix Renormalization Group
 Winter School <http://sites.google.com/site/dmrg101/home>`_.
 
-The present documentation describes the use of the code *per-se*. If you
-are interested in the physics behind and how to use it to learn or teach
-DMRG, you should visit `dmrg101's Github page
-<http://iglpdc.github.com/dmrg101>`_, which includes among other things a
-tutorial with exercises on DMRG.
+The present documentation describes the use of the code *per-se*. For
+other information you could visit:
+
+- the `dmrg101's website <http://iglpdc.github.com/dmrg101>`_,
+- the `Taipei Density Matrix Renormalization Group Winter School's website <http://sites.google.com/site/dmrg101/home>`_,
+- the `school's tutorial website <https://dmrg101.readthedocs.org/en/tutorial/>`_.
 
 This documentation has two parts, one for users of the code and another
 for developers. If you are just interested in using the code to learn
 physics or following the tutorial for the school, you will probably need
-to read only the User Documentation. If you are also interested in
+to read only the `User Documentation`_. If you are also interested in
 modifying the code, expand it, or just want to dig into and mess around
-you may want to read the Developer Documentation.
+you may want to read the `Developer Documentation`_.
 
 Unless stated explicitily otherwise, all the materials are under a
 :download:`MIT license<../LICENSE>`, meaning pretty much that you can use
-it as you want. [#]_
+it as you want.
 
 
 User Documentation
 ------------------
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    getting_started
-   how_to_use_the_code
+   installation
+   quick_example
+   submit_a_bug
    faq
    acknowledgements
    
 Developer Documentation
 -----------------------
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    
    getting_the_code
-   submit_a_bug
    ref/dmrg101
-
-
-.. [#] I think... 

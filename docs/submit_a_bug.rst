@@ -1,11 +1,13 @@
-How to submit a bug
--------------------
+================================
+Report a problem or submit a bug
+================================
 
-If you find a bug, have suggestions or comments, both for the code itself
-or on how to improve the tutorial, please fill a bug/suggestion report using `our
-issue tracker <https://github.com/iglpdc/dmrg101/issues>`_. Please choose
-the proper label for your issue and provide as much information as
-possible, specially if you're reporting a bug.
+If you want to report a problem, find a bug, have suggestions or comments,
+both for the code itself or on how to improve the tutorial, please fill a
+report using `our issue tracker
+<https://github.com/iglpdc/dmrg101/issues>`_. Please choose the proper
+label for your issue and provide as much information as possible,
+specially if you're reporting a bug.
 
 .. seealso::
 
