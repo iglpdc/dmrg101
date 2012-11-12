@@ -1,5 +1,5 @@
 # 
-# File: exceptions.py
+# File: dmrg_exceptions.py
 # Author: Ivan Gonzalez
 # 
 """Exception class for the DMRG code
