@@ -3,10 +3,10 @@
     Returns the N smallest eigenvalues of a
     tridiagonal matrix [A] = [c\d\c].
 '''    
+import numpy as np
+import scipy.optimize
 from lamRange import *
-from ridder import *
 from sturmSeq import sturmSeq
-from numpy import zeros
 
 def eigenvals3(d,c,N):
 
@@ -14,9 +14,8 @@ def eigenvals3(d,c,N):
         p = sturmSeq(d,c,x)
         return p[len(p)-1]
 
-    lam = zeros(N)
+    evals = np.empty(N)
     r = lamRange(d,c,N)   # Bracket eigenvalues
     for i in range(N):    # Solve by Brent's method
-        lam[i] = ridder(f,r[i],r[i+1])
-    return lam   
-
+        evals[i] = scipy.optimize.brentq(f,r[i],r[i+1])
+    return evals   
