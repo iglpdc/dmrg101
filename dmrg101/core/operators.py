@@ -131,7 +131,7 @@ class Operator(OperatorComponent):
         result = Wavefunction(self.left_dim, self.right_dim)
 
         tmp = np.dot(self.right_op, wf.as_matrix.transpose())
-	result.as_matrix = np.dot(self.left_op, tmp.transpose())
+	result.as_matrix = self.parameter * np.dot(self.left_op, tmp.transpose())
 
 	return result
 		
