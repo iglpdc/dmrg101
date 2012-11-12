@@ -53,8 +53,8 @@ Examples
 >>> ising_fm_in_field.add(one, s_z, -h)
 >>> gs_energy, gs_wf = calculate_ground_state(ising_fm_in_field)
 >>> print gs_energy
--0.27
->>> print gs_wf 
+-0.35
+>>> print gs_wf.as_matrix
 [[ 0.  0.]
 [[ 0.  1.]
 
@@ -139,8 +139,6 @@ def generate_tridiagonal_matrix(alpha, beta, iteration):
     for i in range(d.size-1):
 	e[i] = beta[i+1]
     e[d.size-1] = 0.0
-    print alpha, beta
-    print d, e
     assert(e.size == d.size)
     assert(e.size == iteration+1)
     return d, e
