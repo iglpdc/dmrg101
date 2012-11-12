@@ -17,5 +17,6 @@ def eigenvals3(d,c,N):
     evals = np.empty(N)
     r = lamRange(d,c,N)   # Bracket eigenvalues
     for i in range(N):    # Solve by Brent's method
+	assert( f(r[i]) * f(r[i+1]) < 0.0 ) 
         evals[i] = scipy.optimize.brentq(f,r[i],r[i+1])
     return evals   
