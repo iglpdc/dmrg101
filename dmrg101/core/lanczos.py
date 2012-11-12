@@ -123,24 +123,24 @@ def generate_tridiagonal_matrix(alpha, beta, iteration):
 	of `d` is `iteration`+1.
     e : a numpy array with ndim = 1.
         The off-diagonal elements of the tridiagonal matrix. The size of
-	`d` is `iteration`+1.
+	`e` is `iteration`.
 
     Raises
     ------
     DMRGException 
-        if `alpha.size` is not equal to `beta.size+1` 
+        if `alpha` and `beta` have different sizes, or you are not in the
+	second iteration at least.
     """
-    if (len(alpha) != len(beta) + 1):
-        DMRGException("alpha and beta have wrong sizes")
     if (len(alpha) != iteration + 1):
-        DMRGException("alpha and beta have wrong sizes")
+        raise DMRGException("alpha has wrong size")
+    if (len(alpha) != len(beta) ):
+        raise DMRGException("beta has wrong size")
+    if not (len(alpha) > 1):
+	raise DMRGException("alpha not large enough")
     d = np.array(alpha)
-    e = np.empty_like(d)
-    for i in range(d.size-1):
-	e[i] = beta[i+1]
-    e[d.size-1] = 0.0
-    assert(e.size == d.size)
-    assert(e.size == iteration+1)
+    e = np.array(beta[:d.size-1])
+    assert(d.size == e.size + 1)
+    assert(d.size == iteration+1)
     return d, e
 
 def diagonalize_tridiagonal_matrix(d, e, eigenvectors):
@@ -169,7 +169,7 @@ def diagonalize_tridiagonal_matrix(d, e, eigenvectors):
     DMRGException 
         if the arrays `d` and `e` have different sizes.
     """
-    if ( d.size != e.size ):
+    if ( d.size != e.size + 1):
         raise DMRGException("Wrong sizes for d, e")
     evals, evecs = tridiagonal_solver(d, e, eigenvectors)
     return evals, evecs
@@ -205,15 +205,14 @@ def lanczos_zeroth_iteration(alpha, beta, lv, hamiltonian):
     """
     if alpha and beta:
         raise DMRGException("Lists not empty at zeroth Lanczos iter")
-    beta.append(0.0) # beta[0] is not defined
     lv[1] = hamiltonian.apply(lv[0])
     alpha.append(get_real(braket(lv[0], lv[1])))
     lv[1].as_matrix -= alpha[0]*lv[0].as_matrix
     beta.append(lv[1].get_norm())
     lv[1].normalize()
     assert(len(alpha) == 1)
-    assert(len(beta) == 2)
-    already_the_ground_state = beta[1] < float_info.epsilon
+    assert(len(beta) == 1)
+    already_the_ground_state = ( beta[0] < float_info.epsilon )
     return already_the_ground_state
 
 def lanczos_nth_iteration(alpha, beta, lv, saved_lanczos_vectors,
@@ -246,20 +245,20 @@ def lanczos_nth_iteration(alpha, beta, lv, saved_lanczos_vectors,
     Raises
     ------
     DMRGException 
-        if `alpha.size` is not equal to `beta.size+1` 
+        if `alpha.size` is not equal to `beta.size` 
     """
-    if (len(alpha) != len(beta) + 1):
+    if len(alpha) != len(beta):
         DMRGException("alpha and beta have wrong sizes")
 
     lv[2] = hamiltonian.apply(lv[1])
     alpha.append(get_real(braket(lv[1], lv[2])))
     lv[2].as_matrix -= (alpha[iteration]*lv[1].as_matrix +
-    		        beta[iteration]*lv[0].as_matrix)
+    		        beta[iteration-1]*lv[0].as_matrix)
     beta.append(lv[2].get_norm())
     lv[2].normalize()
     cycle_lanczos_vectors(lv, saved_lanczos_vectors)
     assert(len(alpha) == iteration + 1)
-    assert(len(beta) == iteration + 2)
+    assert(len(beta) == iteration + 1)
 
 def cycle_lanczos_vectors(lv, saved_lanczos_vectors):
     """Cycles the Lanczos vectors to prepare them for the next iteration.
