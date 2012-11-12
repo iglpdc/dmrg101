@@ -29,7 +29,7 @@ def tridiagonal_solver(d, e, eigenvectors = True):
     TridiagonalException 
         if `d` and `e` have different sizes.
     """
-    if (d.size != e.size):
+    if (d.size != e.size + 1):
         raise TridiagonalException("d, and e have different sizes")
     num_evals = d.size
     evals = np.empty(num_evals)
