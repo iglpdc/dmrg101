@@ -120,8 +120,8 @@ class SpinOneHalfSite(Site):
     >>> print spin_one_half_site.operators.keys()
     ['s_p', 's_z', 's_m', 'id']
     >>> print spin_one_half_site.operators['s_z']
-    [[-1.  0.]
-     [ 0.  1.]]
+    [[-0.5  0. ]
+     [ 0.   0.5]]
     >>> print spin_one_half_site.operators['s_p']
     [[ 0.  0.]
      [ 1.  0.]]
@@ -147,8 +147,8 @@ class SpinOneHalfSite(Site):
         s_p = self.operators["s_p"]
         s_m = self.operators["s_m"]
 	# set the matrix elements different from zero to the right values
-        s_z[0, 0] = -1.0
-        s_z[1, 1] = 1.0
+        s_z[0, 0] = -0.5
+        s_z[1, 1] = 0.5
         s_p[1, 0] = 1.0
         s_m[0, 1] = 1.0
 
