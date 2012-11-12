@@ -70,6 +70,7 @@ from dmrg101.core.dmrg_exceptions import DMRGException
 from dmrg101.core.get_real import get_real 
 from dmrg101.core.wavefunction import create_empty_like
 from dmrg101.core.wavefunction import Wavefunction
+from dmrg101.utils.tridiagonal_solver.tridiagonal_solver import tridiagonal_solver
 
 def create_lanczos_vectors(initial_wf):
     """Creates the three Lanczos vectors.
@@ -103,6 +104,9 @@ def generate_tridiagonal_matrix(alpha, beta, iteration):
     diagonal and off-diagonal elements of the tridiagonal matrix. Note
     that `d`, `e` sizes depend on the `iteration`.
 
+    The off-diagonal element array `e` have one less element, but you
+    padded by the end with an extra 0.0 (so append a last element equal to 0.0).
+
     Parameters
     ----------
     alpha : a list of doubles.
@@ -120,18 +124,31 @@ def generate_tridiagonal_matrix(alpha, beta, iteration):
     e : a numpy array with ndim = 1.
         The off-diagonal elements of the tridiagonal matrix. The size of
 	`d` is `iteration`+1.
+
+    Raises
+    ------
+    DMRGException 
+        if `alpha.size` is not equal to `beta.size+1` 
     """
-    d = np.copy(alpha[:iteration+1])
+    if (len(alpha) != len(beta) + 1):
+        DMRGException("alpha and beta have wrong sizes")
+    if (len(alpha) != iteration + 1):
+        DMRGException("alpha and beta have wrong sizes")
+    d = np.array(alpha)
     e = np.empty_like(d)
     for i in range(d.size-1):
 	e[i] = beta[i+1]
     e[d.size-1] = 0.0
+    print alpha, beta
+    print d, e
     assert(e.size == d.size)
     assert(e.size == iteration+1)
     return d, e
 
 def diagonalize_tridiagonal_matrix(d, e, eigenvectors):
     """Diagonalizes the tridiagonal matrix in the Lanczos.
+
+    Just a wrapper.
 
     Parameters
     ----------
@@ -148,8 +165,15 @@ def diagonalize_tridiagonal_matrix(d, e, eigenvectors):
         The eigenvalues.
     evecs : a numpy array with ndim = 2.
         The eigenvectors.
+
+    Raises
+    ------
+    DMRGException 
+        if the arrays `d` and `e` have different sizes.
     """
-    #TODO: the real code.
+    if ( d.size != e.size ):
+        raise DMRGException("Wrong sizes for d, e")
+    evals, evecs = tridiagonal_solver(d, e, eigenvectors)
     return evals, evecs
     
 def lanczos_zeroth_iteration(alpha, beta, lv, hamiltonian):
@@ -220,7 +244,15 @@ def lanczos_nth_iteration(alpha, beta, lv, saved_lanczos_vectors,
     -----
     Postcond : The 3rd Lanczos vector in the tuple is modified. The first
     two are *not*.
+
+    Raises
+    ------
+    DMRGException 
+        if `alpha.size` is not equal to `beta.size+1` 
     """
+    if (len(alpha) != len(beta) + 1):
+        DMRGException("alpha and beta have wrong sizes")
+
     lv[2] = hamiltonian.apply(lv[1])
     alpha.append(get_real(braket(lv[1], lv[2])))
     lv[2].as_matrix -= (alpha[iteration]*lv[1].as_matrix +
@@ -353,7 +385,7 @@ def calculate_ground_state_energy(hamiltonian, initial_wf,
     
 	assert(we_are_done)
 	saved_lanczos_vectors.append(lv[1])
-	saved_lanczos_vectors.append(lv[2])
+	#saved_lanczos_vectors.append(lv[2])
     else: # initial_wf *is* the ground state
 	gs_energy = alpha[0]
   
@@ -367,24 +399,22 @@ def calculate_ground_state_wf(d, e, saved_lanczos_vectors):
     ----------
     d : a numpy array with ndim = 1.
         The elements of the diagonal of the tridiagonal matrix. The size
-	of `d` is `iteration`+1.
+	of `d`.
     e : a numpy array with ndim = 1.
         The off-diagonal elements of the tridiagonal matrix. The size of
-	`d` is `iteration`+1.
+	`e` equals the size of `d`, and it is padded with a zero at the
+	end. 
     saved_lanczos_vectors : a list of Wavefunctions.
         The Lanczos vectors that are saved.
 
     Returns
     -------
     result : a Wavefunction.
-        The ground state function.
+        The ground state function (normalized).
     """
     evals, evecs = diagonalize_tridiagonal_matrix(d, e, True)
     min_index = np.argsort(evals)[0]
-    # TODO rows or cols?
-    # TODO is flatten neccesary?
-    # get column with index min_index.
-    coefficients_of_gs_in_krylov_space = np.flatten(evecs[:, min_index])
+    coefficients_of_gs_in_krylov_space = evecs[:, min_index]
     assert(len(saved_lanczos_vectors) == len(coefficients_of_gs_in_krylov_space))
     
     result = Wavefunction(saved_lanczos_vectors[0].left_dim,
@@ -394,6 +424,7 @@ def calculate_ground_state_wf(d, e, saved_lanczos_vectors):
         result.as_matrix += ( coefficients_of_gs_in_krylov_space[i] * 
 		saved_lanczos_vectors[i].as_matrix )
 
+    result.normalize()
     return result 
 
 def calculate_ground_state(hamiltonian, initial_wf = None, 
@@ -422,7 +453,7 @@ def calculate_ground_state(hamiltonian, initial_wf = None,
     gs_energy : a double.
         The ground state energy.
     gs_wf : a Wavefunction.
-        The ground state wavefunction.
+        The ground state wavefunction (normalized.)
     """
     if initial_wf is None:
         initial_wf = Wavefunction(hamiltonian.left_dim,
