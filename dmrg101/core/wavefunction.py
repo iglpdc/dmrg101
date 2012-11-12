@@ -195,7 +195,7 @@ class Wavefunction(object):
 	"""
 	try:
 	    self.as_matrix /= self.get_norm()
-	except ValueError:
+	except:
 	    raise DMRGException("Wavefunction norm is zero")
 
     def randomize(self):
