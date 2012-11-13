@@ -49,8 +49,8 @@ need build in: ::
     >>> right_spin = SpinOneHalfSite()
     >>> # check all it's what you expected
     >>> print left_spin.operators['s_z']
-    [[-1.  0.]
-     [ 0.  1.]]
+    [[-0.5.  0. ]
+     [ 0.    0.5]]
     >>> print left_spin.operators['s_p']
     [[ 0.  0.]
      [ 1.  0.]]
