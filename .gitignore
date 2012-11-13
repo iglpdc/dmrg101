@@ -34,4 +34,3 @@ MANIFEST
 
 # The build from sphinx for both the docs and the tutorial dirs
 docs/_build
-tutorial/_build

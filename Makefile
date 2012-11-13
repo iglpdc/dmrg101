@@ -35,4 +35,3 @@ dist:
 
 .PHONY : all
 all:	test doc requires dist
-
