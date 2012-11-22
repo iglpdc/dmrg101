@@ -4,7 +4,7 @@
 #
 """ A module for single sites.
 """
-from numpy import zeros, eye
+import numpy as np
 from dmrg_exceptions import DMRGException
 
 class Site(object):
@@ -20,7 +20,7 @@ class Site(object):
 	Size of the Hilbert space. The dimension must be at least 1. A site of
         dim = 1  represents the vaccum (or something strange like that, it's
         used for demo purposes mostly.)
-    operators : dictionary of string and ndarray (with ndim = 2)
+    operators : a dictionary of string and numpy array (with ndim = 2).
 	Operators for the site.
 
     Examples
@@ -52,7 +52,7 @@ class Site(object):
     	    raise DMRGException("Site dim must be at least 1")
     	super(Site, self).__init__()
     	self.dim = dim
-	self.operators={ "id" : eye(self.dim, self.dim) }
+	self.operators={ "id" : np.eye(self.dim, self.dim) }
     
     def add_operator(self, operator_name):
     	"""Adds an operator to the site.
@@ -92,7 +92,7 @@ class Site(object):
 	if str(operator_name) in self.operators.keys():
     	    raise DMRGException("Operator name exists already")
     	else:
-    	    self.operators[str(operator_name)] = zeros((self.dim, self.dim))
+    	    self.operators[str(operator_name)] = np.zeros((self.dim, self.dim))
 
 
 class SpinOneHalfSite(Site):
