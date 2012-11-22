@@ -1,4 +1,4 @@
-"""Gets tge real part of a complex number as a double.
+"""Gets the real part of a complex number as a double.
 """
 def get_real(real_or_complex_number):
     """Gets the real part of a complex number as a double.
