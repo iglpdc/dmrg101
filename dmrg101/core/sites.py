@@ -41,7 +41,7 @@ class Site(object):
 	Raises
 	------
 	DMRGException
-	     if `dim` < 1.
+	    if `dim` < 1.
 
 	Notes	
 	-----
@@ -55,7 +55,7 @@ class Site(object):
 	self.operators={ "id" : eye(self.dim, self.dim) }
     
     def add_operator(self, operator_name):
-    	"""Adds an operator to the site
+    	"""Adds an operator to the site.
     
     	Parameters
 	----------
