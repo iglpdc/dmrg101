@@ -46,12 +46,12 @@ def transform_matrix(matrix_to_transform, transformation_matrix):
     >>> evals, evecs = diagonalize(symmetric_matrix)
     >>> transformed_matrix = transform_matrix(original_matrix, evecs)
     >>> print transformed_matrix
-    [[ 1. 0. ]
-     [ 0. 1. ]]		    
+    [[ 1.  0.]
+     [ 0.  1.]] 
     """
-    if original_matrix.shape[0] != original_matrix.shape[1]:
+    if matrix_to_transform.shape[0] != matrix_to_transform.shape[1]:
 	raise DMRGException("Cannot transform a non-square matrix")
-    if original_matrix.shape[0] != transformation_matrix.shape[0]:
+    if matrix_to_transform.shape[0] != transformation_matrix.shape[0]:
 	raise DMRGException("Matrix and transformation don't fit")
     tmp = np.dot(matrix_to_transform, transformation_matrix)
-    return np.dot(np.conj(transform_matrix.transpose()), tmp)
+    return np.dot(np.conj(transformation_matrix.transpose()), tmp)
