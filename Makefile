@@ -16,7 +16,7 @@ install:
 # all together in a python distribution that you can tag and upload to
 # github.
 #
-.PHONY: test requires doc api-doc dist 
+.PHONY: test requires doc api-doc dist clean
 test: 
 	nosetests tests
 	nosetests --with-doctest --doctest-options='+ELLIPSIS'
@@ -32,6 +32,9 @@ doc: api-doc
 
 dist:
 	python setup.py sdist --formats=gztar,zip
+
+clean:
+	rm docs/ref/*rst
 
 .PHONY : all
 all:	test doc requires dist
