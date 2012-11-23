@@ -1,6 +1,14 @@
 core Package
 ============
 
+:mod:`block` Module
+-------------------
+
+.. automodule:: dmrg101.core.block
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`braket` Module
 --------------------
 
@@ -41,6 +49,14 @@ core Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`make_tensor` Module
+-------------------------
+
+.. automodule:: dmrg101.core.make_tensor
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`operators` Module
 -----------------------
 
@@ -65,6 +81,22 @@ core Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`system` Module
+--------------------
+
+.. automodule:: dmrg101.core.system
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`transform_matrix` Module
+------------------------------
+
+.. automodule:: dmrg101.core.transform_matrix
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`truncation_error` Module
 ------------------------------
 
@@ -77,6 +109,14 @@ core Package
 --------------------------
 
 .. automodule:: dmrg101.core.wavefunction
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`wavefunction_transformation` Module
+-----------------------------------------
+
+.. automodule:: dmrg101.core.wavefunction_transformation
     :members:
     :undoc-members:
     :show-inheritance:
