@@ -42,9 +42,9 @@ def diagonalize(reduced_density_matrix):
     >>> evals, evecs = diagonalize(symmetric_matrix)
     >>> print evals
     [-0.45  1.  ]
-    >>> tmp = np.dot(evecs, symmetric_matrix)
-    >>> evecs_diagonalize_the_matrix = np.dot(tmp, evecs.transpose())
-    >>> print evecs_diagonalize_the_matrix
+    >>> tmp = np.dot(symmetric_matrix, evecs)
+    >>> evecs_diagonalize_matrix = np.dot(evecs.transpose(), tmp)
+    >>> print evecs_diagonalize_matrix
     [[ -0.45  0. ]
      [  0.   1. ]]    
     >>> hermitian_matrix = np.array([[0.0, -1.0j],
@@ -52,9 +52,9 @@ def diagonalize(reduced_density_matrix):
     >>> evals, evecs = diagonalize(hermitian_matrix)
     >>> print evals
     [-1.  1.]
-    >>> tmp = np.dot(evecs, hermitian_matrix)
-    >>> evecs_diagonalize_the_matrix = np.dot(tmp, np.conj(evecs.transpose()))
-    >>> print evecs_diagonalize_the_matrix
+    >>> tmp = np.dot(hermitian_matrix, evecs)
+    >>> evecs_diagonalize_matrix = np.dot(np.conj(evecs.transpose()), tmp)
+    >>> print evecs_diagonalize_matrix
     [[ -1.  0.  ]
      [  0.  1.  ]]    
     """
