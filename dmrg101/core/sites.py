@@ -52,7 +52,7 @@ class Site(object):
     	    raise DMRGException("Site dim must be at least 1")
     	super(Site, self).__init__()
     	self.dim = dim
-	self.operators={ "id" : np.eye(self.dim, self.dim) }
+	self.operators = { "id" : np.eye(self.dim, self.dim) }
     
     def add_operator(self, operator_name):
     	"""Adds an operator to the site.
