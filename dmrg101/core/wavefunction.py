@@ -221,7 +221,7 @@ class Wavefunction(object):
 	>>> print norm
 	1.0
 	"""
-	self.as_matrix = np.random.rand(self.left_dim, self.right_dim)
+	self.as_matrix = 2 * np.random.rand(self.left_dim, self.right_dim) - 1
 	self.normalize()
     
     def set_to_zero(self):
