@@ -10,6 +10,42 @@ import lanczos
 from make_tensor import make_tensor 
 from operators import CompositeOperator 
 
+def make_updated_block_for_site(transformation_matrix,
+		                operators_to_add_to_block):
+    """Make a new block for a list of operators.
+
+    Takes a dictionary of operator names and matrices and makes a new
+    block inserting in the `operators` block dictionary the result of
+    transforming the matrices in the original dictionary accoring to the
+    transformation matrix.
+
+    You use this function everytime you want to create a new block by
+    transforming the current operators to a truncated basis. 
+
+    Parameters
+    ----------
+    transformation_matrix : a numpy array of ndim = 2.
+        The transformation matrix coming from a (truncated) unitary
+	transformation.
+    operators_to_add_to_block : a dict of strings and numpy arrays of ndim = 2.
+        The list of operators to transform.
+
+    Returns
+    -------
+    result : a Block.
+        A block with the new transformed operators.
+    """
+    cols_of_transformation_matrix = transformation_matrix.shape[1]
+    result = Block(cols_of_transformation_matrix)
+    for key in operators_to_add_to_block.keys():
+	result.add_operator(key)
+	result[key] = transform_matrix(operators_to_add_to_block[key],
+			               transformation_matrix)
+    assert(len(result.operators) == len(operators_to_add_to_block))
+    assert(len(result.operators.keys()) ==
+           len(operators_to_add_to_block.keys()))
+    return result
+
 class System(object):
     """The system class for the DMRG algorithm.
 
@@ -84,6 +120,8 @@ class System(object):
 	self.right_dim = self.right_block.dim * self.right_site.dim
 	self.h = CompositeOperator(self.left_dim, self.right_dim)
 	self.operators_to_add_to_block = {}
+	self.old_left_blocks = []
+	self.old_right_blocks = []
 	# 
 	# start growing on the left, which may look as random as start
 	# growing on the right, but however the latter will ruin the
@@ -222,7 +260,17 @@ class System(object):
 	result : a Block.
 	   A new block
 	"""
-	updated_operators = {}
+	if self.growing_side == 'left':
+	    self.old_left_blocks.append(self.left_block)
+	    self.left_block = make_updated_block_for_site( (
+		    transformation_matrix, self.operators_to_add_to_block)
+		    )
+	else:
+	    self.old_right_blocks.append(self.right_block)
+	    self.right_block = make_updated_block_for_site( (
+		    transformation_matrix, self.operators_to_add_to_block)
+		    )
+
 
     def calculate_ground_state(self, initial_wf=None, min_lanczos_iterations=3, 
 		               too_many_iterations=1000, precision=0.000001):
