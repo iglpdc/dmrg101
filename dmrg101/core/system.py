@@ -4,11 +4,12 @@
 #
 """ A module for a DMRG system.
 """
-from block import make_block_from_site
+from block import make_block_from_site, Block
 from dmrg_exceptions import DMRGException
 import lanczos 
 from make_tensor import make_tensor 
 from operators import CompositeOperator 
+from transform_matrix import transform_matrix 
 
 def make_updated_block_for_site(transformation_matrix,
 		                operators_to_add_to_block):
@@ -39,11 +40,14 @@ def make_updated_block_for_site(transformation_matrix,
     result = Block(cols_of_transformation_matrix)
     for key in operators_to_add_to_block.keys():
 	result.add_operator(key)
-	result[key] = transform_matrix(operators_to_add_to_block[key],
+	result.operators[key] = transform_matrix(operators_to_add_to_block[key],
 			               transformation_matrix)
-    assert(len(result.operators) == len(operators_to_add_to_block))
-    assert(len(result.operators.keys()) ==
-           len(operators_to_add_to_block.keys()))
+	# debug only 
+	#print operators_to_add_to_block[key]
+	#print transformation_matrix
+	#print result.operators[key]
+	#print '--------'
+	# end debug only 
     return result
 
 class System(object):
@@ -116,9 +120,7 @@ class System(object):
 	else:
 	    self.right_block = make_block_from_site(left_site)
 
-	self.left_dim = self.left_block.dim * self.left_site.dim
-	self.right_dim = self.right_block.dim * self.right_site.dim
-	self.h = CompositeOperator(self.left_dim, self.right_dim)
+	self.h = CompositeOperator(self.get_left_dim(), self.get_right_dim())
 	self.operators_to_add_to_block = {}
 	self.old_left_blocks = []
 	self.old_right_blocks = []
@@ -128,6 +130,21 @@ class System(object):
 	# *whole* thing.
 	#
 	self.set_growing_side('left')
+
+    def clear_hamiltonian(self):
+        """Makes a brand new hamiltonian.
+	"""
+	self.h = CompositeOperator(self.get_left_dim(), self.get_right_dim())
+
+    def get_left_dim(self):
+	"""Gets the dimension of the Hilbert space of the left block
+	"""
+	return self.left_block.dim * self.left_site.dim
+    
+    def get_right_dim(self):
+	"""Gets the dimension of the Hilbert space of the right block
+	"""
+	return self.right_block.dim * self.right_site.dim
 
     def set_growing_side(self, growing_side):
 	"""Sets which side, left or right, is growing.
@@ -153,9 +170,15 @@ class System(object):
 	if self.growing_side == 'left':
 	    self.growing_site = self.left_site
 	    self.growing_block = self.left_block
+	    self.shrinking_site = self.right_site
+	    self.shrinking_block = self.right_block
+	    self.shrinking_side = 'right'
 	else:
 	    self.growing_site = self.right_site
 	    self.growing_block = self.right_block
+	    self.shrinking_site = self.left_site
+	    self.shrinking_block = self.left_block
+	    self.shrinking_side = 'left'
 
     def add_to_hamiltonian(self, left_block_op='id', left_site_op='id', 
     		           right_site_op='id', right_block_op='id',
@@ -208,6 +231,47 @@ class System(object):
 		                    self.right_site.operators[right_site_op])
 	self.h.add(left_side_op, right_side_op, param)
 	
+    def add_to_operators_to_update(self, name, block_op='id', site_op='id'):
+	"""Adds a term to the hamiltonian.
+
+	You use this function to add an operator to the list of operators
+	that you need to update. You need to update an operator if it is
+	going to be part of a term in the Hamiltonian in any later step in
+	the current sweep.
+
+	Parameters
+	----------
+	name : a string.
+	    The name of the operator you are including in the list to
+	    update.
+	left_block_op : a string (optional).
+	    The name of an operator in the left block of the system.
+	left_site_op : a string (optional).
+	    The name of an operator in the left site of the system.
+
+	Raises
+	------
+	DMRGException 
+	    if any of the operators are not in the corresponding
+	    site/block.
+
+	Examples
+	--------
+        >>> from dmrg101.core.sites import SpinOneHalfSite
+        >>> from dmrg101.core.system import System
+        >>> # build a system with four spins one-half.
+        >>> spin_one_half_site = SpinOneHalfSite()
+        >>> ising_fm_in_field = System(spin_one_half_site)
+        >>> # some stuff here..., but the only operator that you need to
+	>>> # update is 's_z' for the last site of the block.
+        >>> ising_fm_in_field.add_to_operators_to_update(site_op='s_z')
+	>>> print ising_fm_in_field.operators_to_add_to_block.keys()
+	('s_z')
+	"""
+	tmp = make_tensor(self.growing_block.operators[block_op],
+		                      self.growing_site.operators[site_op])
+	self.operators_to_add_to_block[name] = tmp
+
     def add_to_block_hamiltonian(self, block_op='id', site_op='id', param=1.0):
 	"""Adds a term to the hamiltonian.
 
@@ -243,7 +307,8 @@ class System(object):
 	"""
 	tmp = make_tensor(self.growing_block.operators[block_op],
 		                      self.growing_site.operators[site_op])
-	self.growing_block.operators['bh'] += param * tmp
+	#assert('bh' in self.growing_block.operators.keys())
+	#self.growing_block.operators['bh'] += param * tmp
 
     def update_all_operators(self, transformation_matrix):
 	"""Updates the operators and puts them in the block.
@@ -262,15 +327,13 @@ class System(object):
 	"""
 	if self.growing_side == 'left':
 	    self.old_left_blocks.append(self.left_block)
-	    self.left_block = make_updated_block_for_site( (
+	    self.left_block = make_updated_block_for_site(
 		    transformation_matrix, self.operators_to_add_to_block)
-		    )
+		    
 	else:
 	    self.old_right_blocks.append(self.right_block)
-	    self.right_block = make_updated_block_for_site( (
+	    self.right_block = make_updated_block_for_site(
 		    transformation_matrix, self.operators_to_add_to_block)
-		    )
-
 
     def calculate_ground_state(self, initial_wf=None, min_lanczos_iterations=3, 
 		               too_many_iterations=1000, precision=0.000001):
