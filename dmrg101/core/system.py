@@ -130,6 +130,7 @@ class System(object):
 	# *whole* thing.
 	#
 	self.set_growing_side('left')
+	self.number_of_sites = None
 
     def clear_hamiltonian(self):
         """Makes a brand new hamiltonian.
@@ -145,6 +146,33 @@ class System(object):
 	"""Gets the dimension of the Hilbert space of the right block
 	"""
 	return self.right_block.dim * self.right_site.dim
+
+    def get_shriking_block_next_step_size(self, left_block_size):
+	"""Gets the size of the shrinking block in the next DMRG step.
+
+	Gets the size of the shrinking block, i.e. the number of sites
+	(not including the single site), in the next step of the finite
+	DMRG algorithm.
+
+	Parameters
+	----------
+	left_block_size : an int.
+	    The *current*, i.e. at the current DMRG step, number of sites
+	    of the left block (despite the sweep is to the left or the
+	    right.) Again this does not include the single site.
+
+	Returns
+	-------
+	result : a int.
+	   The number of sites of the shrinking block, without including
+	   the single site.
+	"""
+	result = None
+	if self.growing_side == 'left':
+	    result = self.number_of_sites - (left_block_size + 3)
+        else:
+	    result = left_block_size - 1
+	return result
 
     def set_growing_side(self, growing_side):
 	"""Sets which side, left or right, is growing.
@@ -334,6 +362,26 @@ class System(object):
 	    self.old_right_blocks.append(self.right_block)
 	    self.right_block = make_updated_block_for_site(
 		    transformation_matrix, self.operators_to_add_to_block)
+ 
+    def set_block_to_old_version(self, left_block_size):
+	"""Sets the block for the shriking block to an old version.
+
+	You use this function in the finite version of the DMRG algorithm
+	to set an shriking block to an old version.
+
+	Parameters
+	----------
+	left_block_size : an int.
+	    The size (not including the single site) of the left block in
+	    the *current* step, despite the sweep be to the left or right.
+	"""
+	shrinking_size = self.get_shriking_block_next_step_size(left_block_size)
+	print left_block_size
+	print shrinking_size
+	if self.shrinking_side == 'left':
+	    self.shrinking_block = self.old_left_blocks[shrinking_size-1]
+	else:
+	    self.shrinking_block = self.old_right_blocks[shrinking_size-1]
 
     def calculate_ground_state(self, initial_wf=None, min_lanczos_iterations=3, 
 		               too_many_iterations=1000, precision=0.000001):
