@@ -23,3 +23,4 @@ virtualenv==1.8.2
 wsgiref==0.1.2
 xattr==0.6.2
 zope.interface==3.5.1
+docopt
