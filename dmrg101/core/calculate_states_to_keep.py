@@ -40,7 +40,7 @@ def calculate_states_to_keep(initial_states, final_states,
     half_sweeeps_to_increase = 2 * (number_of_sweeps - 1)
     step = (final_states - initial_states) / half_sweeeps_to_increase
     padding = (final_states - initial_states) % half_sweeeps_to_increase
-    result = arange(initial_states+padding, final_states, step)
-    result.append([final_states, final_states])
+    result = range(initial_states+padding, final_states, step)
+    result += [final_states, final_states]
     assert(len(result) == 2 * number_of_sweeps)
     return result
