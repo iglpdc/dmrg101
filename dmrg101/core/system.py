@@ -518,7 +518,7 @@ class System(object):
         going to sweep next using the finite algorithm we don't care much
         about precision at this stage.
         """
-        self.model.set_hamiltonian()
+        self.set_hamiltonian()
         ground_state_energy, ground_state_wf = self.calculate_ground_state()
         entropy, truncation_error = self.grow_block_by_one_site('left', 
 			                                        ground_state_wf, 
