@@ -458,7 +458,7 @@ class System(object):
         truncation_error = calculate_truncation_error(truncated_evals)
         self.set_block_hamiltonian()
         self.set_operators_to_update()
-        system.update_all_operators(truncation_matrix)
+        self.update_all_operators(truncation_matrix)
         return entropy, truncation_error
 
     def set_hamiltonian(self):
