@@ -1,22 +1,21 @@
-"""A few convenience functions to setup the Heisenberg model.
+"""A few convenience functions to setup the Ising model in a TF.
+
+TFIM stands for Ising model in a transverse field, i.e.:
 
 .. math::
-    H=\sum_{i}\vec{S}_{i}\cdot\vec{S}_{i+1}=
-    \sum_{i}\left[S^{z}_{i}S^{z}_{i+1}+
-    \frac{1}{2}\left(S^{\dagger}_{i}S^{-}_{i+1}+
-    S^{-}_{i}S^{\dagger}_{i+1}\right)\right]
-
+    H=\sum_{i}\left[S^{z}_{i}S^{z}_{i+1} + h S^{x}_{i}\right)\right]
 """
-class HeisenbergModel(object):
-    """Implements a few convenience functions for AF Heisenberg.
+class TranverseFieldIsingModel(object):
+    """Implements a few convenience functions for the TFIM.
     
     Does exactly that.
     """
-    def __init__(self):
-        super(HeisenbergModel, self).__init__()
+    def __init__(self, h = 0):
+        super(TranverseFieldIsingModel, self).__init__()
+	self.h = h
 		
     def set_hamiltonian(self, system):
-        """Sets a system Hamiltonian to the AF Heisenberg Hamiltonian.
+        """Sets a system Hamiltonian to the TFIM Hamiltonian.
     
         Does exactly this. If the system hamiltonian has some other terms on
         it, there are not touched. So be sure to use this function only in
@@ -33,17 +32,15 @@ class HeisenbergModel(object):
         if 'bh' in system.right_block.operators.keys():
             system.add_to_hamiltonian(right_block_op='bh')
         system.add_to_hamiltonian('id', 'id', 's_z', 's_z')
-        system.add_to_hamiltonian('id', 'id', 's_p', 's_m', .5)
-        system.add_to_hamiltonian('id', 'id', 's_m', 's_p', .5)
         system.add_to_hamiltonian('id', 's_z', 's_z', 'id')
-        system.add_to_hamiltonian('id', 's_p', 's_m', 'id', .5)
-        system.add_to_hamiltonian('id', 's_m', 's_p', 'id', .5)
         system.add_to_hamiltonian('s_z', 's_z', 'id', 'id')
-        system.add_to_hamiltonian('s_p', 's_m', 'id', 'id', .5)
-        system.add_to_hamiltonian('s_m', 's_p', 'id', 'id', .5)
+        system.add_to_hamiltonian('id', 'id', 'id', 's_x', self.h)
+        system.add_to_hamiltonian('id', 'id', 's_x', 'id', self.h)
+        system.add_to_hamiltonian('id', 's_x', 'id', 'id', self.h)
+        system.add_to_hamiltonian('s_x', 'id', 'id', 'id', self.h)
     
     def set_block_hamiltonian(self, system):
-        """Sets the block Hamiltonian to be what you need for AF Heisenberg.
+        """Sets the block Hamiltonian to be what you need for TFIM.
     
         Parameters
         ----------
@@ -54,11 +51,11 @@ class HeisenbergModel(object):
         if 'bh' in system.growing_block.operators.keys():
             system.add_to_block_hamiltonian('bh', 'id')
         system.add_to_block_hamiltonian('s_z', 's_z')
-        system.add_to_block_hamiltonian('s_p', 's_m', .5)
-        system.add_to_block_hamiltonian('s_m', 's_p', .5)
+        system.add_to_hamiltonian('id', 's_x', self.h)
+        system.add_to_hamiltonian('s_x', 'id', self.h)
     
     def set_operators_to_update(self, system):
-        """Sets the operators to update to be what you need to AF Heisenberg.
+        """Sets the operators to update to be what you need to TFIM.
     
         Parameters
         ----------
@@ -69,5 +66,4 @@ class HeisenbergModel(object):
         if 'bh' in system.growing_block.operators.keys():
             system.add_to_operators_to_update('bh', block_op='bh')
         system.add_to_operators_to_update('s_z', site_op='s_z')
-        system.add_to_operators_to_update('s_p', site_op='s_p')
-        system.add_to_operators_to_update('s_m', site_op='s_m')
+        system.add_to_operators_to_update('s_x', site_op='s_x')
