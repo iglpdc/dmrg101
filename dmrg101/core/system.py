@@ -10,6 +10,9 @@ import lanczos
 from make_tensor import make_tensor 
 from operators import CompositeOperator 
 from transform_matrix import transform_matrix 
+from entropies import calculate_entropy, calculate_renyi
+from reduced_DM import diagonalize, truncate
+from truncation_error import calculate_truncation_error
 
 def make_updated_block_for_site(transformation_matrix,
 		                operators_to_add_to_block):
@@ -131,6 +134,7 @@ class System(object):
 	#
 	self.set_growing_side('left')
 	self.number_of_sites = None
+	self.model = None
 
     def clear_hamiltonian(self):
         """Makes a brand new hamiltonian.
@@ -415,3 +419,164 @@ class System(object):
 	return lanczos.calculate_ground_state(self.h, initial_wf, 
 			                      min_lanczos_iterations, 
 		                              too_many_iterations, precision)
+
+    def grow_block_by_one_site(self, growing_block, ground_state_wf, 
+    		               number_of_states_kept):
+        """Grows one side of the system by one site.
+    
+        Calculates the truncation matrix by calculating the reduced density
+        matrix for `ground_state_wf` by tracing out the degrees of freedom of
+        the shrinking side. Then updates the operators you need in the next
+        steps, effectively growing the size of the block by one site. 	
+        
+        Parameters
+        ----------
+        growing_block : a string.
+            The block which is growing. It must be 'left' or 'right'.
+        ground_state_wf : a Wavefunction.
+            The ground state wavefunction of your system.
+        number_of_states_kept : an int.
+            The number of states you want to keep in each block after the
+    	    truncation. If the `number_of_states_kept` is smaller than the
+    	    dimension of the current Hilbert space block, all states are kept.
+     
+        Returns
+        -------
+        entropy : a double.
+            The Von Neumann entropy for the cut that splits the chain into two
+    	    equal halves.
+        truncation_error : a double.
+            The truncation error, i.e. the sum of the discarded eigenvalues of
+    	    the reduced density matrix.
+        """
+        system.set_growing_side(growing_block)
+        rho = ground_state_wf.build_reduced_density_matrix(system.shrinking_side)
+        evals, evecs = diagonalize(rho)
+        truncated_evals, truncation_matrix = truncate(evals, evecs,
+    		                                  number_of_states_kept)
+        entropy = calculate_entropy(truncated_evals)
+        truncation_error = calculate_truncation_error(truncated_evals)
+        self.set_block_hamiltonian()
+        self.set_operators_to_update()
+        system.update_all_operators(truncation_matrix)
+        return entropy, truncation_error
+
+    def set_hamiltonian(self):
+        """Sets a system Hamiltonian to the model Hamiltonian.
+
+	Just a wrapper around the corresponding `Model` method.
+	"""
+	self.model.set_hamiltonian(self)
+    
+    def set_block_hamiltonian(self):
+        """Sets the block Hamiltonian to model block Hamiltonian.
+	
+	Just a wrapper around the corresponding `Model` method.
+	"""
+	self.model.set_block_hamiltonian(self)
+    
+    def set_operators_to_update(self):
+        """Sets the operators to update to be what you need to AF Heisenberg.
+	
+	Just a wrapper around the corresponding `Model` method.
+	"""
+	self.model.set_operators_to_update(self)
+
+    def infinite_dmrg_step(self, number_of_states_kept):
+        """Performs one step of the (asymmetric) infinite DMRG algorithm.
+    
+        Calculates the ground state of a system with a given size, then
+        performs the DMRG transformation on the operators of *one* block,
+        therefore increasing by one site the number of sites encoded in the
+        Hilbert space of this block, and reset the block in the system to be
+        the new, enlarged, truncated ones. The other block is kept one-site
+        long.
+    
+        Parameters
+        ----------
+        number_of_states_kept : an int.
+            The number of states you want to keep in each block after the
+    	truncation. If the `number_of_states_kept` is smaller than the
+    	dimension of the current Hilbert space block, all states are kept.
+     
+        Returns
+        -------
+        energy : a double.
+            The energy for the `current_size`.
+        entropy : a double.
+            The Von Neumann entropy for the cut that splits the chain into two
+    	    equal halves.
+        truncation_error : a double.
+            The truncation error, i.e. the sum of the discarded eigenvalues of
+    	    the reduced density matrix.
+    
+        Notes
+        -----
+        This asymmetric version of the algorithm when you just grow one of the
+        block while keeping the other one-site long, is obviously less precise
+        than the symmetric version when you grow both sides. However as we are
+        going to sweep next using the finite algorithm we don't care much
+        about precision at this stage.
+        """
+        self.model.set_hamiltonian()
+        ground_state_energy, ground_state_wf = self.calculate_ground_state()
+        entropy, truncation_error = self.grow_block_by_one_site('left', 
+			                                        ground_state_wf, 
+    		                                                number_of_states_kept)
+        return ground_state_energy, entropy, truncation_error
+    
+    def finite_dmrg_step(self, growing_block, left_block_size, number_of_states_kept):
+        """Performs one step of the finite DMRG algorithm.
+    
+        Calculates the ground state of a system with a given size, then
+        performs the DMRG transformation on the operators of *one* block,
+        therefore increasing by one site the number of sites encoded in the
+        Hilbert space of this block, and reset the block in the system to be
+        the new, enlarged, truncated ones. The other block is read out from
+        the previous sweep.
+    
+        Parameters
+        ----------
+        growing_block : a string.
+            The block which is growing. It must be 'left' or 'right'.
+        left_block_size : an int.
+            The number of sites in the left block in the *current* step, not
+    	    including the single site.     
+        number_of_states_kept : an int.
+            The number of states you want to keep in each block after the
+    	    truncation. If the `number_of_states_kept` is smaller than the
+    	    dimension of the current Hilbert space block, all states are kept.
+     
+        Returns
+        -------
+        energy : a double.
+            The energy at this step.
+        entropy : a double.
+            The Von Neumann entropy for the cut at this step.
+        truncation_error : a double.
+            The truncation error, i.e. the sum of the discarded eigenvalues of
+    	the reduced density matrix.
+    
+        Raises
+        ------
+        DMRGException
+            if `growing_side` is not 'left' or 'right'.
+    
+        Notes
+        -----
+        This asymmetric version of the algorithm when you just grow one of the
+        block while keeping the other one-site long, is obviously less precise
+        than the symmetric version when you grow both sides. However as we are
+        going to sweep next using the finite algorithm we don't care much
+        about precision at this stage.
+        """
+        self.set_hamiltonian()
+        ground_state_energy, ground_state_wf = self.calculate_ground_state()
+        if growing_block not in ('left', 'right'):
+    	    raise DMRGException('Growing side must be left or right.')
+    
+        entropy, truncation_error = self.grow_block_by_one_site(growing_block, 
+    		                                                ground_state_wf,
+    		                                                number_of_states_kept)
+        self.set_block_to_old_version(left_block_size)
+        return ground_state_energy, entropy, truncation_error
