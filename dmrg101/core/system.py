@@ -449,8 +449,8 @@ class System(object):
             The truncation error, i.e. the sum of the discarded eigenvalues of
     	    the reduced density matrix.
         """
-        system.set_growing_side(growing_block)
-        rho = ground_state_wf.build_reduced_density_matrix(system.shrinking_side)
+        self.set_growing_side(growing_block)
+        rho = ground_state_wf.build_reduced_density_matrix(self.shrinking_side)
         evals, evecs = diagonalize(rho)
         truncated_evals, truncation_matrix = truncate(evals, evecs,
     		                                  number_of_states_kept)
