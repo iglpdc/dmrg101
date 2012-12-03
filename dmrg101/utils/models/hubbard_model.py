@@ -14,6 +14,7 @@ class HubbardModel(object):
     """
     def __init__(self):
         super(HubbardModel, self).__init__()
+	self.U = 0.
 		
     def set_hamiltonian(self, system):
         """Sets a system Hamiltonian to the Hubbard Hamiltonian.
@@ -84,6 +85,6 @@ class HubbardModel(object):
         """
         system.add_to_operators_to_update('c_up', site_op='c_up')
         system.add_to_operators_to_update('c_up_dag', site_op='c_up_dag')
-        system.add_to_operators_to_downdate('c_down', site_op='c_down')
-        system.add_to_operators_to_downdate('c_down_dag', site_op='c_down_dag')
+        system.add_to_operators_to_update('c_down', site_op='c_down')
+        system.add_to_operators_to_update('c_down_dag', site_op='c_down_dag')
         system.add_to_operators_to_update('u', site_op='u')
