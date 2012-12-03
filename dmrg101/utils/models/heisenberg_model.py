@@ -42,20 +42,22 @@ class HeisenbergModel(object):
         system.add_to_hamiltonian('s_p', 's_m', 'id', 'id', .5)
         system.add_to_hamiltonian('s_m', 's_p', 'id', 'id', .5)
     
-    def set_block_hamiltonian(self, system):
+    def set_block_hamiltonian(self, tmp_matrix_for_bh, system):
         """Sets the block Hamiltonian to be what you need for AF Heisenberg.
     
         Parameters
         ----------
+	tmp_matrix_for_bh : a numpy array of ndim = 2.
+	    An auxiliary matrix to keep track of the result.
         system : a System.
             The System you want to set the Hamiltonian for.
         """
         # If you have a block hamiltonian in your block, add it
         if 'bh' in system.growing_block.operators.keys():
-            system.add_to_block_hamiltonian('bh', 'id')
-        system.add_to_block_hamiltonian('s_z', 's_z')
-        system.add_to_block_hamiltonian('s_p', 's_m', .5)
-        system.add_to_block_hamiltonian('s_m', 's_p', .5)
+            system.add_to_block_hamiltonian(tmp_matrix_for_bh, 'bh', 'id')
+        system.add_to_block_hamiltonian(tmp_matrix_for_bh, 's_z', 's_z')
+        system.add_to_block_hamiltonian(tmp_matrix_for_bh, 's_p', 's_m', .5)
+        system.add_to_block_hamiltonian(tmp_matrix_for_bh, 's_m', 's_p', .5)
     
     def set_operators_to_update(self, system):
         """Sets the operators to update to be what you need to AF Heisenberg.
@@ -64,10 +66,12 @@ class HeisenbergModel(object):
         ----------
         system : a System.
             The System you want to set the Hamiltonian for.
+
+	Notes
+	-----
+	The block Hamiltonian, althought needs to be updated, is treated
+	separately by the very functions in the `System` class.
         """
-        # If you have a block hamiltonian in your block, update it
-        if 'bh' in system.growing_block.operators.keys():
-            system.add_to_operators_to_update('bh', block_op='bh')
         system.add_to_operators_to_update('s_z', site_op='s_z')
         system.add_to_operators_to_update('s_p', site_op='s_p')
         system.add_to_operators_to_update('s_m', site_op='s_m')

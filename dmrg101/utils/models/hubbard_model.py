@@ -49,23 +49,25 @@ class HubbardModel(object):
         system.add_to_hamiltonian('id', 'id', 'u', 'id', self.U)
         system.add_to_hamiltonian('id', 'id', 'id', 'u', self.U)
     
-    def set_block_hamiltonian(self, system):
+    def set_block_hamiltonian(self, tmp_matrix_for_bh, system):
         """Sets the block Hamiltonian to the Hubbard model block Hamiltonian.
     
         Parameters
         ----------
+	tmp_matrix_for_bh : a numpy array of ndim = 2.
+	    An auxiliary matrix to keep track of the result.
         system : a System.
             The System you want to set the Hamiltonian for.
         """
         # If you have a block hamiltonian in your block, add it
         if 'bh' in system.growing_block.operators.keys():
-            system.add_to_block_hamiltonian('bh', 'id')
-        system.add_to_block_hamiltonian('c_up', 'c_up_dag', -1.)
-        system.add_to_block_hamiltonian('c_up_dag', 'c_up', -1.)
-        system.add_to_block_hamiltonian('c_down', 'c_down_dag', -1.)
-        system.add_to_block_hamiltonian('c_down_dag', 'c_down', -1.)
-        system.add_to_block_hamiltonian('id', 'u', self.U)
-        system.add_to_block_hamiltonian('u', 'id', self.U)
+            system.add_to_block_hamiltonian(tmp_matrix_for_bh, 'bh', 'id')
+        system.add_to_block_hamiltonian(tmp_matrix_for_bh, 'c_up', 'c_up_dag', -1.)
+        system.add_to_block_hamiltonian(tmp_matrix_for_bh, 'c_up_dag', 'c_up', -1.)
+        system.add_to_block_hamiltonian(tmp_matrix_for_bh, 'c_down', 'c_down_dag', -1.)
+        system.add_to_block_hamiltonian(tmp_matrix_for_bh, 'c_down_dag', 'c_down', -1.)
+        system.add_to_block_hamiltonian(tmp_matrix_for_bh, 'id', 'u', self.U)
+        system.add_to_block_hamiltonian(tmp_matrix_for_bh, 'u', 'id', self.U)
     
     def set_operators_to_update(self, system):
         """Sets the operators to update to the ones for the Hubbard model.
@@ -74,10 +76,12 @@ class HubbardModel(object):
         ----------
         system : a System.
             The System you want to set the Hamiltonian for.
+
+	Notes
+	-----
+	The block Hamiltonian, althought needs to be updated, is treated
+	separately by the very functions in the `System` class.
         """
-        # If you have a block hamiltonian in your block, update it
-        if 'bh' in system.growing_block.operators.keys():
-            system.add_to_operators_to_update('bh', block_op='bh')
         system.add_to_operators_to_update('c_up', site_op='c_up')
         system.add_to_operators_to_update('c_up_dag', site_op='c_up_dag')
         system.add_to_operators_to_downdate('c_down', site_op='c_down')
