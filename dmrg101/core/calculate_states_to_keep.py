@@ -4,6 +4,8 @@
 #
 """A module to increase the number of states in the finite algorithm.
 """
+from dmrg101.core.dmrg_exceptions import DMRGException
+
 def calculate_states_to_keep(initial_states, final_states,
 		             number_of_sweeps):
     """Increases the number of states linearly during the finite algorithm.
@@ -39,6 +41,8 @@ def calculate_states_to_keep(initial_states, final_states,
     """
     half_sweeeps_to_increase = 2 * (number_of_sweeps - 1)
     step = (final_states - initial_states) / half_sweeeps_to_increase
+    if step <= 0:
+        raise DMRGException('Final number of states <= initial')
     padding = (final_states - initial_states) % half_sweeeps_to_increase
     result = range(initial_states+padding, final_states, step)
     result += [final_states, final_states]
