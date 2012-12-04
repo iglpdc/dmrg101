@@ -4,6 +4,8 @@
 #
 """ A module for a DMRG system.
 """
+import numpy as np
+from copy import deepcopy
 from block import make_block_from_site, Block
 from dmrg_exceptions import DMRGException
 import lanczos 
@@ -44,13 +46,7 @@ def make_updated_block_for_site(transformation_matrix,
     for key in operators_to_add_to_block.keys():
 	result.add_operator(key)
 	result.operators[key] = transform_matrix(operators_to_add_to_block[key],
-			               transformation_matrix)
-	# debug only 
-	#print operators_to_add_to_block[key]
-	#print transformation_matrix
-	#print result.operators[key]
-	#print '--------'
-	# end debug only 
+			                         transformation_matrix)
     return result
 
 class System(object):
@@ -176,6 +172,8 @@ class System(object):
 	    result = self.number_of_sites - (left_block_size + 3)
         else:
 	    result = left_block_size - 1
+	if result < 0:
+	   raise DMRGException("Block shrank too much")
 	return result
 
     def set_growing_side(self, growing_side):
@@ -301,10 +299,11 @@ class System(object):
 	('s_z')
 	"""
 	tmp = make_tensor(self.growing_block.operators[block_op],
-		                      self.growing_site.operators[site_op])
+		          self.growing_site.operators[site_op])
 	self.operators_to_add_to_block[name] = tmp
 
-    def add_to_block_hamiltonian(self, block_op='id', site_op='id', param=1.0):
+    def add_to_block_hamiltonian(self, tmp_matrix_for_bh, block_op='id', 
+		                 site_op='id', param=1.0):
 	"""Adds a term to the hamiltonian.
 
 	You use this function to add a term to the Hamiltonian of the
@@ -312,6 +311,8 @@ class System(object):
 
 	Parameters
 	----------
+	tmp_matrix_for_bh : a numpy array of ndim = 2.
+	    An auxiliary matrix to keep track of the result.
 	left_block_op : a string (optional).
 	    The name of an operator in the left block of the system.
 	left_site_op : a string (optional).
@@ -338,9 +339,8 @@ class System(object):
         >>> ising_fm_in_field.add_to_block_hamiltonian('s_z', 's_z')
 	"""
 	tmp = make_tensor(self.growing_block.operators[block_op],
-		                      self.growing_site.operators[site_op])
-	#assert('bh' in self.growing_block.operators.keys())
-	#self.growing_block.operators['bh'] += param * tmp
+		          self.growing_site.operators[site_op])
+	tmp_matrix_for_bh += param * tmp
 
     def update_all_operators(self, transformation_matrix):
 	"""Updates the operators and puts them in the block.
@@ -358,34 +358,34 @@ class System(object):
 	   A new block
 	"""
 	if self.growing_side == 'left':
-	    self.old_left_blocks.append(self.left_block)
+	    self.old_left_blocks.append(deepcopy(self.left_block))
 	    self.left_block = make_updated_block_for_site(
 		    transformation_matrix, self.operators_to_add_to_block)
-		    
 	else:
-	    self.old_right_blocks.append(self.right_block)
+	    self.old_right_blocks.append(deepcopy(self.right_block))
 	    self.right_block = make_updated_block_for_site(
 		    transformation_matrix, self.operators_to_add_to_block)
  
-    def set_block_to_old_version(self, left_block_size):
+    def set_block_to_old_version(self, shrinking_size):
 	"""Sets the block for the shriking block to an old version.
 
-	You use this function in the finite version of the DMRG algorithm
-	to set an shriking block to an old version.
+	Sets the block for the shriking block to an old version. in
+	preparation for the next DMRG step. You use this function in the
+	finite version of the DMRG algorithm to set an shriking block to
+	an old version.
 
 	Parameters
 	----------
-	left_block_size : an int.
-	    The size (not including the single site) of the left block in
-	    the *current* step, despite the sweep be to the left or right.
+	shrinking_size : an int.
+	    The size (not including the single site) of the shrinking side
+	    in the *next* step of the finite algorithm.
 	"""
-	shrinking_size = self.get_shriking_block_next_step_size(left_block_size)
-	print left_block_size
-	print shrinking_size
+	if shrinking_size == 0:
+	    raise DMRGException("You need to turn around")
 	if self.shrinking_side == 'left':
-	    self.shrinking_block = self.old_left_blocks[shrinking_size-1]
+	    self.left_block = self.old_left_blocks[shrinking_size-1]
 	else:
-	    self.shrinking_block = self.old_right_blocks[shrinking_size-1]
+	    self.right_block = self.old_right_blocks[shrinking_size-1]
 
     def calculate_ground_state(self, initial_wf=None, min_lanczos_iterations=3, 
 		               too_many_iterations=1000, precision=0.000001):
@@ -420,19 +420,15 @@ class System(object):
 			                      min_lanczos_iterations, 
 		                              too_many_iterations, precision)
 
-    def grow_block_by_one_site(self, growing_block, ground_state_wf, 
-    		               number_of_states_kept):
+    def get_truncation_matrix(self, ground_state_wf, number_of_states_kept):
         """Grows one side of the system by one site.
     
         Calculates the truncation matrix by calculating the reduced density
         matrix for `ground_state_wf` by tracing out the degrees of freedom of
-        the shrinking side. Then updates the operators you need in the next
-        steps, effectively growing the size of the block by one site. 	
+        the shrinking side.  	
         
         Parameters
         ----------
-        growing_block : a string.
-            The block which is growing. It must be 'left' or 'right'.
         ground_state_wf : a Wavefunction.
             The ground state wavefunction of your system.
         number_of_states_kept : an int.
@@ -442,6 +438,9 @@ class System(object):
      
         Returns
         -------
+	truncation_matrix : a numpy array with ndim = 2.
+	    The truncation matrix from the reduced density matrix
+	    diagonalization.
         entropy : a double.
             The Von Neumann entropy for the cut that splits the chain into two
     	    equal halves.
@@ -449,17 +448,29 @@ class System(object):
             The truncation error, i.e. the sum of the discarded eigenvalues of
     	    the reduced density matrix.
         """
-        self.set_growing_side(growing_block)
         rho = ground_state_wf.build_reduced_density_matrix(self.shrinking_side)
         evals, evecs = diagonalize(rho)
         truncated_evals, truncation_matrix = truncate(evals, evecs,
-    		                                  number_of_states_kept)
+    		                                      number_of_states_kept)
         entropy = calculate_entropy(truncated_evals)
         truncation_error = calculate_truncation_error(truncated_evals)
+        return truncation_matrix, entropy, truncation_error
+
+    def grow_block_by_one_site(self, truncation_matrix):
+        """Grows one side of the system by one site.
+    
+	Uses the truncation matrix to update the operators you need in the
+	next steps, effectively growing the size of the block by one site. 	
+
+	Parameters
+	----------
+	truncation_matrix : a numpy array with ndim = 2.
+	    The truncation matrix from the reduced density matrix
+	    diagonalization.
+	"""
         self.set_block_hamiltonian()
         self.set_operators_to_update()
         self.update_all_operators(truncation_matrix)
-        return entropy, truncation_error
 
     def set_hamiltonian(self):
         """Sets a system Hamiltonian to the model Hamiltonian.
@@ -473,7 +484,14 @@ class System(object):
 	
 	Just a wrapper around the corresponding `Model` method.
 	"""
-	self.model.set_block_hamiltonian(self)
+	tmp_matrix_size = None
+	if self.growing_side == 'left':
+	    tmp_matrix_size = self.get_left_dim()
+        else: 
+	    tmp_matrix_size = self.get_right_dim()
+	tmp_matrix_for_bh = np.zeros((tmp_matrix_size, tmp_matrix_size))
+	self.model.set_block_hamiltonian(tmp_matrix_for_bh, self)
+	self.operators_to_add_to_block['bh'] = tmp_matrix_for_bh
     
     def set_operators_to_update(self):
         """Sets the operators to update to be what you need to AF Heisenberg.
@@ -482,7 +500,7 @@ class System(object):
 	"""
 	self.model.set_operators_to_update(self)
 
-    def infinite_dmrg_step(self, number_of_states_kept):
+    def infinite_dmrg_step(self, left_block_size, number_of_states_kept):
         """Performs one step of the (asymmetric) infinite DMRG algorithm.
     
         Calculates the ground state of a system with a given size, then
@@ -496,8 +514,8 @@ class System(object):
         ----------
         number_of_states_kept : an int.
             The number of states you want to keep in each block after the
-    	truncation. If the `number_of_states_kept` is smaller than the
-    	dimension of the current Hilbert space block, all states are kept.
+    	    truncation. If the `number_of_states_kept` is smaller than the
+    	    dimension of the current Hilbert space block, all states are kept.
      
         Returns
         -------
@@ -518,14 +536,20 @@ class System(object):
         going to sweep next using the finite algorithm we don't care much
         about precision at this stage.
         """
+        self.set_growing_side('left')
         self.set_hamiltonian()
         ground_state_energy, ground_state_wf = self.calculate_ground_state()
-        entropy, truncation_error = self.grow_block_by_one_site('left', 
-			                                        ground_state_wf, 
-    		                                                number_of_states_kept)
+        truncation_matrix, entropy, truncation_error = (
+	    self.get_truncation_matrix(ground_state_wf,
+		                       number_of_states_kept) )
+	if left_block_size == self.number_of_sites - 3:
+	    self.turn_around('right')
+	else:
+            self.grow_block_by_one_site(truncation_matrix)
         return ground_state_energy, entropy, truncation_error
     
-    def finite_dmrg_step(self, growing_block, left_block_size, number_of_states_kept):
+    def finite_dmrg_step(self, growing_side, left_block_size, 
+		         number_of_states_kept):
         """Performs one step of the finite DMRG algorithm.
     
         Calculates the ground state of a system with a given size, then
@@ -537,8 +561,8 @@ class System(object):
     
         Parameters
         ----------
-        growing_block : a string.
-            The block which is growing. It must be 'left' or 'right'.
+	growing_side : a string.
+	    Which side, left or right, is growing.
         left_block_size : an int.
             The number of sites in the left block in the *current* step, not
     	    including the single site.     
@@ -555,7 +579,7 @@ class System(object):
             The Von Neumann entropy for the cut at this step.
         truncation_error : a double.
             The truncation error, i.e. the sum of the discarded eigenvalues of
-    	the reduced density matrix.
+    	    the reduced density matrix.
     
         Raises
         ------
@@ -570,13 +594,54 @@ class System(object):
         going to sweep next using the finite algorithm we don't care much
         about precision at this stage.
         """
-        self.set_hamiltonian()
-        ground_state_energy, ground_state_wf = self.calculate_ground_state()
-        if growing_block not in ('left', 'right'):
+        if growing_side not in ('left', 'right'):
     	    raise DMRGException('Growing side must be left or right.')
     
-        entropy, truncation_error = self.grow_block_by_one_site(growing_block, 
-    		                                                ground_state_wf,
-    		                                                number_of_states_kept)
-        self.set_block_to_old_version(left_block_size)
+        self.set_growing_side(growing_side)
+        self.set_hamiltonian()
+        ground_state_energy, ground_state_wf = self.calculate_ground_state()
+        truncation_matrix, entropy, truncation_error = (
+	    self.get_truncation_matrix(ground_state_wf,
+		                       number_of_states_kept) )
+	shrinking_size = self.get_shriking_block_next_step_size(left_block_size)
+	print 'in next step',
+	print 'shrinking size', 
+	print shrinking_size
+	print "shrinking side is",
+	print self.shrinking_side
+	if shrinking_size == 0:
+	    self.turn_around(self.shrinking_side)
+	else:
+            self.grow_block_by_one_site(truncation_matrix)
+            self.set_block_to_old_version(shrinking_size)
         return ground_state_energy, entropy, truncation_error
+
+    def turn_around(self, new_growing_side):
+	"""Turns around in the finite algorithm.
+
+	When you reach the smallest possible size for your shriking block,
+	you must turn around and start sweeping in the other direction.
+	This is just done by setting the to be growing side, which
+	currently is skrinking, to be made up of a single site, and by
+	setting the to be shrinking side, which now is growing to be the
+	current growing block.
+
+	Parameters
+	----------
+	new_growing_side : a string.
+	    The side that will start growing.
+	"""
+	print 'Turning around. Next moving to the',
+	print new_growing_side
+	if new_growing_side == 'left':
+	    self.left_block = make_block_from_site(self.left_site)
+	    self.right_block = self.old_right_blocks[-1]
+	    self.old_left_blocks = []
+	    print 'len(self.old_right_blocks)',
+	    print len(self.old_right_blocks)
+	else:
+	    self.right_block = make_block_from_site(self.right_site)
+	    self.left_block = self.old_left_blocks[-1]
+	    self.old_right_blocks = []
+	    print 'len(self.old_left_blocks)',
+	    print len(self.old_left_blocks)
