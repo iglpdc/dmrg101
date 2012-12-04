@@ -10,9 +10,9 @@ class TranverseFieldIsingModel(object):
     
     Does exactly that.
     """
-    def __init__(self, h = 0):
+    def __init__(self, H = 0):
         super(TranverseFieldIsingModel, self).__init__()
-	self.h = h
+	self.H = H
 		
     def set_hamiltonian(self, system):
         """Sets a system Hamiltonian to the TFIM Hamiltonian.
