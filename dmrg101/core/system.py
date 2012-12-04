@@ -604,11 +604,6 @@ class System(object):
 	    self.get_truncation_matrix(ground_state_wf,
 		                       number_of_states_kept) )
 	shrinking_size = self.get_shriking_block_next_step_size(left_block_size)
-	print 'in next step',
-	print 'shrinking size', 
-	print shrinking_size
-	print "shrinking side is",
-	print self.shrinking_side
 	if shrinking_size == 0:
 	    self.turn_around(self.shrinking_side)
 	else:
@@ -631,17 +626,9 @@ class System(object):
 	new_growing_side : a string.
 	    The side that will start growing.
 	"""
-	print 'Turning around. Next moving to the',
-	print new_growing_side
 	if new_growing_side == 'left':
 	    self.left_block = make_block_from_site(self.left_site)
-	    self.right_block = self.old_right_blocks[-1]
 	    self.old_left_blocks = []
-	    print 'len(self.old_right_blocks)',
-	    print len(self.old_right_blocks)
 	else:
 	    self.right_block = make_block_from_site(self.right_site)
-	    self.left_block = self.old_left_blocks[-1]
 	    self.old_right_blocks = []
-	    print 'len(self.old_left_blocks)',
-	    print len(self.old_left_blocks)
