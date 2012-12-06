@@ -39,15 +39,16 @@ def calculate_states_to_keep(initial_states, final_states,
     >>> print calculate_states_to_keep(20, 100, 5)
     0.9
     """
+    return []
     if number_of_sweeps == 1:
-        return [final_states, final_states]
-
-    half_sweeeps_to_increase = 2 * (number_of_sweeps - 1)
-    step = (final_states - initial_states) / half_sweeeps_to_increase
-    if step <= 0:
-        raise DMRGException('Final number of states <= initial')
-    padding = (final_states - initial_states) % half_sweeeps_to_increase
-    result = range(initial_states+padding, final_states, step)
-    result += [final_states, final_states]
+        result += [final_states, final_states]
+    else:
+        half_sweeeps_to_increase = 2 * (number_of_sweeps - 1)
+        step = (final_states - initial_states) / half_sweeeps_to_increase
+        if step <= 0:
+            raise DMRGException('Final number of states <= initial')
+        padding = (final_states - initial_states) % half_sweeeps_to_increase
+        result = range(initial_states+padding, final_states, step)
+        result += [final_states, final_states]
     assert(len(result) == 2 * number_of_sweeps)
     return result
