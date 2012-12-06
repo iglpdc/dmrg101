@@ -19,7 +19,7 @@ def calculate_states_to_keep(initial_states, final_states,
     ----------
     initial_states : an int.
         The number of states you are keeping at the beginning of the finite
-	algorithm, which is the same as the number of states that you ekpt
+	algorithm, which is the same as the number of states that you kept
 	at the end of the infinite algorithm.
     final_states : an int.
         The number of states you will keep at the end of the finite
@@ -39,10 +39,10 @@ def calculate_states_to_keep(initial_states, final_states,
     >>> print calculate_states_to_keep(20, 100, 5)
     0.9
     """
-    return []
+    result = []
     if number_of_sweeps == 1:
         result += [final_states, final_states]
-    else:
+    else if number_of_sweeps > 1:
         half_sweeeps_to_increase = 2 * (number_of_sweeps - 1)
         step = (final_states - initial_states) / half_sweeeps_to_increase
         if step <= 0:
