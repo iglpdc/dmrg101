@@ -512,6 +512,8 @@ class System(object):
     
         Parameters
         ----------
+	left_block_size : an int.
+	    The number of sites of the left block, not including the single site.
         number_of_states_kept : an int.
             The number of states you want to keep in each block after the
     	    truncation. If the `number_of_states_kept` is smaller than the
