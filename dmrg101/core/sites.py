@@ -94,6 +94,57 @@ class Site(object):
     	else:
     	    self.operators[str(operator_name)] = np.zeros((self.dim, self.dim))
 
+class PauliSite(Site):
+    """A site for spin 1/2 models.
+    
+    You use this site for models where the single sites are spin
+    one-half sites. The Hilbert space is ordered such as the first state
+    is the spin down, and the second state is the spin up. Therefore e.g.
+    you have the following relation between operator matrix elements:
+
+    .. math::
+        \langle \downarrow \left| A \\right|\uparrow \\rangle = A_{0,1}
+
+    Notes
+    -----
+    Postcond : The site has already built-in the spin operators for s_z, s_p, s_m.
+
+    Examples
+    --------
+    >>> from dmrg101.core.sites import PauliSite
+    >>> pauli_site = PauliSite()
+    >>> # check all it's what you expected
+    >>> print pauli_site.dim
+    2
+    >>> print pauli_site.operators.keys()
+    ['s_p', 's_z', 's_m', 'id']
+    >>> print pauli_site.operators['s_z']
+    [[-1.  0.]
+     [ 0.  1.]]
+    >>> print pauli_site.operators['s_x']
+    [[ 0.  1.]
+     [ 1.  0.]]
+    """
+    def __init__(self):
+	"""Creates the spin one-half site with Pauli matrices.
+
+	Notes
+	-----
+	Postcond : the dimension is set to 2, and the Pauli matrices
+	are added as operators.
+	"""
+        super(PauliSite, self).__init__(2)
+	# add the operators
+        self.add_operator("s_z")
+        self.add_operator("s_x")
+	# for clarity
+        s_z = self.operators["s_z"]
+        s_x = self.operators["s_x"]
+	# set the matrix elements different from zero to the right values
+        s_z[0, 0] = -1.0
+        s_z[1, 1] = 1.0
+        s_x[0, 1] = 1.0
+        s_x[1, 0] = 1.0
 
 class SpinOneHalfSite(Site):
     """A site for spin 1/2 models.
@@ -142,15 +193,19 @@ class SpinOneHalfSite(Site):
         self.add_operator("s_z")
         self.add_operator("s_p")
         self.add_operator("s_m")
+        self.add_operator("s_x")
 	# for clarity
         s_z = self.operators["s_z"]
         s_p = self.operators["s_p"]
         s_m = self.operators["s_m"]
+        s_x = self.operators["s_x"]
 	# set the matrix elements different from zero to the right values
         s_z[0, 0] = -0.5
         s_z[1, 1] = 0.5
         s_p[1, 0] = 1.0
         s_m[0, 1] = 1.0
+        s_x[0, 1] = 0.5
+        s_x[1, 0] = 0.5
 
 
 class ElectronicSite(Site):
