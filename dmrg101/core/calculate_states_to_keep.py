@@ -42,7 +42,7 @@ def calculate_states_to_keep(initial_states, final_states,
     result = []
     if number_of_sweeps == 1:
         result += [final_states, final_states]
-    else if number_of_sweeps > 1:
+    elif number_of_sweeps > 1:
         half_sweeeps_to_increase = 2 * (number_of_sweeps - 1)
         step = (final_states - initial_states) / half_sweeeps_to_increase
         if step <= 0:
