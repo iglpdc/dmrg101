@@ -31,13 +31,13 @@ class TranverseFieldIsingModel(object):
             system.add_to_hamiltonian(left_block_op='bh')
         if 'bh' in system.right_block.operators.keys():
             system.add_to_hamiltonian(right_block_op='bh')
-        system.add_to_hamiltonian('id', 'id', 's_z', 's_z')
-        system.add_to_hamiltonian('id', 's_z', 's_z', 'id')
-        system.add_to_hamiltonian('s_z', 's_z', 'id', 'id')
-        system.add_to_hamiltonian('id', 'id', 'id', 's_x', self.h)
-        system.add_to_hamiltonian('id', 'id', 's_x', 'id', self.h)
-        system.add_to_hamiltonian('id', 's_x', 'id', 'id', self.h)
-        system.add_to_hamiltonian('s_x', 'id', 'id', 'id', self.h)
+        system.add_to_hamiltonian('id', 'id', 's_z', 's_z', -1.)
+        system.add_to_hamiltonian('id', 's_z', 's_z', 'id', -1.)
+        system.add_to_hamiltonian('s_z', 's_z', 'id', 'id', -1.)
+        system.add_to_hamiltonian('id', 'id', 'id', 's_x', self.H)
+        system.add_to_hamiltonian('id', 'id', 's_x', 'id', self.H)
+        system.add_to_hamiltonian('id', 's_x', 'id', 'id', self.H)
+        system.add_to_hamiltonian('s_x', 'id', 'id', 'id', self.H)
     
     def set_block_hamiltonian(self, tmp_matrix_for_bh, system):
         """Sets the block Hamiltonian to be what you need for TFIM.
@@ -52,9 +52,9 @@ class TranverseFieldIsingModel(object):
         # If you have a block hamiltonian in your block, add it
         if 'bh' in system.growing_block.operators.keys():
             system.add_to_block_hamiltonian(tmp_matrix_for_bh, 'bh', 'id')
-        system.add_to_block_hamiltonian(tmp_matrix_for_bh, 's_z', 's_z')
-        system.add_to_hamiltonian(tmp_matrix_for_bh, 'id', 's_x', system.h)
-        system.add_to_hamiltonian('s_x', 'id', self.h)
+        system.add_to_block_hamiltonian(tmp_matrix_for_bh, 's_z', 's_z', -1.)
+        system.add_to_block_hamiltonian(tmp_matrix_for_bh, 'id', 's_x', self.H)
+        system.add_to_block_hamiltonian(tmp_matrix_for_bh, 's_x', 'id', self.H)
     
     def set_operators_to_update(self, system):
         """Sets the operators to update to be what you need to TFIM.
